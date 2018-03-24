@@ -1,8 +1,14 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<div class="jumbotron text-center">
-	<h1>Welcoem to Human Resource Management</h1>
-	<p class="lead">This Application i y</p>
- </div>
+
+<div class='wrap'>
+  Login
+    <form>
+        <input type='text' id='username' placeholder='Employee Id'>
+        <input type='password' id='password' placeholder='Password'>
+    </form>
+    <button class='login'>Log In</button>
+</div>
+
 {% endblock %}
