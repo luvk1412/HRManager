@@ -1,8 +1,13 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<div class="jumbotron text-center">
-	<h1>Welcoem to Human Resource Management</h1>
-	<p class="lead">This Application i y</p>
- </div>
+<div class="container"  style="margin-top:2%; background-color: #2ba6cb;">
+	<input type="text" placeholder="Employee id" size = "4";>
+	<button type="button" class="btn btn-primary float-md-left" align:right>View Profile</button>
+	<button type="button" class="btn btn-primary float-md-right">Register Employee</button>
+	<form method='POST' action="">
+	<div class=
+		{{render_field(form.name), class_="form-control")}}
+	</form>
+</div>
 {% endblock %}
