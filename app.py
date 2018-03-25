@@ -1,5 +1,5 @@
 from flask import Flask, render_template, flash, redirect, request, url_for, session, logging
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators
+from wtforms import Form, StringField, TextAreaField, PasswordField, validators, SelectField
 from passlib.hash import sha256_crypt
 from flask_mysqldb import MySQL
 
@@ -23,9 +23,6 @@ mysql = MySQL(app)
 def home():
 	return render_template('home.html')
 
-@app.route('/employee/add')
-def add_employee():
-	return render_template('add_employee.html')
 
 @app.route('/employee/view')
 def view_employee():
@@ -60,13 +57,25 @@ class emp_form(Form):
 	fname = StringField('First Name', [validators.Length(min = 1,max = 50)])
 	lname = StringField('Last Name', [validators.Length(min = 1,max = 50)])
 	email = StringField('Email', [validators.Length(min = 1,max = 50)])
+	department = SelectField('Department', choices=['Overall','Finance','Research','Sales', 'Marketing'])
+	designation = SelectField('Designation', choices=['Ceo','HOD','Manager','Employee', 'Intern', 'Peon'])
 	password = PasswordField('Password', [
 		validators.DataRequired(),
 		validators.Length(min = 5,max = 50),
 		validators.EqualTo('confirm', message="Password do not match")
 	])
 	confirm = PasswordField('Confirm Password')
-	adress = StringField('Adress', [validators.Length(min = 1,max = 500)])
+	address = StringField('Address', [validators.Length(min = 1,max = 500)])
+
+
+@app.route('/employee/add', methods=['GET', 'POST'])
+def add_employee():
+#	print ("Hello")
+	form = emp_form(request.form)
+	if request.method == 'POST' and form.validate():
+		return redirect(url_for('login'))
+	return render_template('add_employee.html', form=form)
+
 
 if __name__ == '__main__':
 	app.run(debug=True)

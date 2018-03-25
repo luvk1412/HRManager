@@ -2,10 +2,38 @@
 
 {% block body %}
 
-<div class="container"  style="margin-top:2%;">
 	
-</div>
-
+	{% from "includes/_formhelpers.html" import render_field %}
+    <div class="jumbotron" style="margin-top:2%;">
+    	<h1 align="center"> Add Employee </h1>
+	    <form method="POST" action="">
+	        <div class="form-group">
+	            {{ render_field(form.fname, class="form-control") }}
+	        </div>
+	        <div class="form-group">
+	            {{ render_field(form.lname, class="form-control") }}
+	        </div>
+	        <div class="form-group">
+	            {{ render_field(form.email, class="form-control") }}
+	        </div>
+	        <div class="form-group">
+	            {{ render_field(form.department, class="form-control") }}
+	        </div>
+	        <div class="form-group">
+	            {{ render_field(form.designation, class="form-control") }}
+	        </div>
+	        <div class="form-group">
+	            {{ render_field(form.address, class="form-control") }}
+	        </div>
+	        <div class="form-group">
+	            {{ render_field(form.password, class="form-control") }}
+	        </div>
+	        <div class="form-group">
+	            {{ render_field(form.confirm, class="form-control") }}
+	        </div>
+	        <p><input type="submit" class="btn btn-primary" value="Submit"></p>
+	    </form>
+	</div>
 
 
 {% endblock %}
