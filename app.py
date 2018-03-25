@@ -57,8 +57,8 @@ class emp_form(Form):
 	fname = StringField('First Name', [validators.Length(min = 1,max = 50)])
 	lname = StringField('Last Name', [validators.Length(min = 1,max = 50)])
 	email = StringField('Email', [validators.Length(min = 1,max = 50)])
-	department = SelectField('Department', choices=['Overall','Finance','Research','Sales', 'Marketing'])
-	designation = SelectField('Designation', choices=['Ceo','HOD','Manager','Employee', 'Intern', 'Peon'])
+	department = SelectField('Department', choices=[('Overall','Overall'), ('Finance', 'Finance'), ('Research', 'Research'), ('Sales', 'Sales'), ('Marketing', 'Marketing')])
+	designation = SelectField('Designation', choices=[('Ceo', 'Ceo'), ('HOD', 'HOD'), ('Manager', 'Manager'), ('Employee', 'Employee'),  ('Intern', 'Intern'),  ('Peon', 'Peon')])
 	password = PasswordField('Password', [
 		validators.DataRequired(),
 		validators.Length(min = 5,max = 50),
