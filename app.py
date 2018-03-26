@@ -54,8 +54,7 @@ def register():
 	return render_template('register.html')
 
 class emp_form(Form):
-	fname = StringField('First Name', [validators.Length(min = 1,max = 50)])
-	lname = StringField('Last Name', [validators.Length(min = 1,max = 50)])
+	name = StringField('Name', [validators.Length(min = 1,max = 50)])
 	email = StringField('Email', [validators.Length(min = 1,max = 50)])
 	department = SelectField('Department', choices=[('Overall','Overall'), ('Finance', 'Finance'), ('Research', 'Research'), ('Sales', 'Sales'), ('Marketing', 'Marketing')])
 	designation = SelectField('Designation', choices=[('Ceo', 'Ceo'), ('HOD', 'HOD'), ('Manager', 'Manager'), ('Employee', 'Employee'),  ('Intern', 'Intern'),  ('Peon', 'Peon')])
@@ -66,6 +65,7 @@ class emp_form(Form):
 	])
 	confirm = PasswordField('Confirm Password')
 	address = StringField('Address', [validators.Length(min = 1,max = 500)])
+	contact = StringField('Contact', [validators.Length(min = 1,max = 10)])
 
 
 @app.route('/employee/add', methods=['GET', 'POST'])
@@ -73,10 +73,25 @@ def add_employee():
 #	print ("Hello")
 	form = emp_form(request.form)
 	if request.method == 'POST' and form.validate():
+		name = form.name.data
+		email = form.email.data
+		department = form.department.data
+		designation = form.designation.data
+		address = form.address.data
+		contact = form.contact.data
+		password = sha256_crypt.encrypt(str(form.password.data))
+		cur = mysql.connection.cursor()
+		cur.execute("INSERT INTO employee(name, email, department, designation, address, contact, password) VALUES(%s, %s, %s, %s, %s, %s, %s)", (name, email, department, designation, address, contact, password))
+		tm_id = int(cur.lastrowid)
+		mysql.connection.commit()
+		cur.close()
+
+		flash('Your are now registered with Employee ID : '+str(tm_id) + '. Kindly Note down this ID !!', 'success')
 		return redirect(url_for('login'))
 	return render_template('add_employee.html', form=form)
 
 
 if __name__ == '__main__':
+	app.secret_key='123456'
 	app.run(debug=True)
 	 
