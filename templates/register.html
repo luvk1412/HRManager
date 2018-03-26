@@ -3,13 +3,13 @@
 {% block body %}
 
 <div class='wrap'>
-  Add Admin
-    <form>
-        <input type='text' id='username' placeholder='Employee Id'>
-        <input type='password' id='password' placeholder='Password'>
-        <input type='password' id='cpassword' placeholder='Confirm Password'>
+  	Add Admin
+    <form method="POST" action="">
+        <input type='text' name='emp_id' placeholder='Employee Id' value={{request.form.emp_id}}>
+        <input type='password' name='password' placeholder='Password' value={{request.form.password}}>
+        <input type='password' name='confirm' placeholder='Confirm Password' value={{request.form.confirm}}>
+    	<button type="submit" class='login'>Register</button>
     </form>
-    <button class='login'>Register</button>
 </div>
 
 {% endblock %}
