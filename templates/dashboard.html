@@ -1,8 +1,17 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<div class="jumbotron" style="margin-top:2%;">
-	<h1>Dashboard <small>Welcome {{session.name}}</h1> 
-	<p class="lead"></p>
- </div>
+<div class="jumbotron text-center" style="margin-top: 2%; font-family:'Karla';">
+      <h1 align=left><b>Dashboard</b></h1></br>
+      <img class="rounded-circle" src="/static/images/{{session.emp_id}}.jpg" height="200px">
+      <h3>Welcome {{session.name}}</h3>
+
+</div>
+
+<div class= "jumbotron text-center">
+	<h3 align=left>Attendance</h3>
+	<h3 align=left>Incentives</h3>
+</div>
+    
+    
 {% endblock %}

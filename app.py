@@ -1,9 +1,12 @@
 from flask import Flask, render_template, flash, redirect, request, url_for, session, logging
-from wtforms import Form, StringField, TextAreaField, PasswordField, validators, SelectField
+from wtforms import Form, StringField, TextAreaField, PasswordField, validators, SelectField,FileField
+from flask_wtf.file import FileField
 from passlib.hash import sha256_crypt
 from functools import wraps 
 from flask_mysqldb import MySQL
 import datetime, time
+from werkzeug import secure_filename
+from flask_uploads import UploadSet, configure_uploads, IMAGES
 app = Flask(__name__, static_url_path='/static')
 
 
@@ -18,6 +21,15 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 #init MYSQL
  
 mysql = MySQL(app)
+
+#UPLOADS
+
+photos = UploadSet('photos', IMAGES)
+app.config['UPLOADED_PHOTOS_DEST'] = 'static/images'
+configure_uploads(app, photos)
+
+
+
 
 def is_logged_in(f):
 	@wraps(f)
@@ -84,7 +96,6 @@ def login():
 	if request.method == 'POST':
 		emp_id = request.form['emp_id']
 		password_candidate = request.form['password']
-
 		cur = mysql.connection.cursor()
 		result = cur.execute("SELECT * FROM employee WHERE id = %s", [emp_id])
 		if result > 0:
@@ -121,8 +132,13 @@ def logout():
 def register():
 	return render_template('register.html')
 
+
+
+
+
 class emp_form(Form):
 	name = StringField('Name', [validators.DataRequired(), validators.Length(min = 1,max = 50)])
+	gender=SelectField('Gender', choices=[('male','male'), ('female','female'), ('other', 'other')])
 	email = StringField('Email', [validators.DataRequired(),validators.Length(min = 1,max = 50)])
 	department = SelectField('Department', choices=[('Overall','Overall'), ('Finance', 'Finance'), ('Research', 'Research'), ('Sales', 'Sales'), ('Marketing', 'Marketing')])
 	designation = SelectField('Designation', choices=[('Ceo', 'Ceo'), ('HOD', 'HOD'), ('Manager', 'Manager'), ('Employee', 'Employee'),  ('Intern', 'Intern'),  ('Peon', 'Peon')])
@@ -139,12 +155,14 @@ class emp_form(Form):
 	contact = StringField('Contact', [validators.DataRequired(),validators.Length(min = 1,max = 10)])
 
 
+
 @app.route('/employee/add', methods=['GET', 'POST'])
 @is_admin_logged_in
 def add_employee():
 	form = emp_form(request.form)
 	if request.method == 'POST' and form.validate():
 		name = form.name.data
+		gender = form.gender.data
 		email = form.email.data
 		department = form.department.data
 		designation = form.designation.data
@@ -157,13 +175,25 @@ def add_employee():
 		cur = mysql.connection.cursor()
 		ts = time.time()
 		timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
-		cur.execute("INSERT INTO employee(name, email, department, designation, address, contact, password, reg_date, admin, city, state, pincode) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, 0, %s, %s, %s)", (name, email, department, designation, address, contact, password, timestamp, city, state, pincode))
+		cur.execute("INSERT INTO employee(name, email, department, designation, address, contact, password, reg_date, admin, city, state, pincode, gender) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, 0, %s, %s, %s, %s)", (name, email, department, designation, address, contact, password, timestamp, city, state, pincode, gender))
 		tm_id = int(cur.lastrowid)
 		mysql.connection.commit()
 		cur.close()
-
-		flash('Your are now registered with Employee ID : '+str(tm_id) + '. Kindly Note down this ID !!', 'success')
-		return redirect(url_for('login'))
+		img_new_name = str(tm_id)
+		flag = 0
+		# for i in image:
+		# 	if i=='.':
+		# 		flag = 1
+		# 	if flag==1:
+		# 		img_new_name.append(i)
+		# image = img_new_name
+	#	app.logger.info(img_new_name)
+		if 'profile_image' in request.files:
+			file = request.files['profile_image']
+			file.filename = str(tm_id) + '.jpg'
+			photos.save(file)
+		flash('Employee has been added with Employee ID : '+str(tm_id) + '. Kindly Note down this ID !!', 'success')
+		return redirect(url_for('add_employee'))
 	return render_template('add_employee.html', form=form)
 
 

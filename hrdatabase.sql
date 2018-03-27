@@ -36,6 +36,7 @@ CREATE TABLE `employee` (
   `city` varchar(50) DEFAULT NULL,
   `state` varchar(50) DEFAULT NULL,
   `pincode` varchar(10) DEFAULT NULL,
+  `gender` varchar(10) DEFAULT NULL,
   PRIMARY KEY (`id`)
 ) ENGINE=InnoDB AUTO_INCREMENT=3 DEFAULT CHARSET=latin1;
 /*!40101 SET character_set_client = @saved_cs_client */;
@@ -46,7 +47,7 @@ CREATE TABLE `employee` (
 
 LOCK TABLES `employee` WRITE;
 /*!40000 ALTER TABLE `employee` DISABLE KEYS */;
-INSERT INTO `employee` VALUES (1,'Luv','luvk1412@gmail.com','Overall','Ceo','BH$ IIIT Allahabad','9803674332','$5$rounds=535000$38RGBfeJwjjpm6B7$yWfNa4RS/GG5cMTF9PBjxjOnlLy/i71g7h5fKtIdBc2','2018-03-26',1,'Amritsar','Punjab','143001'),(2,'Luv2','llll','Overall','Ceo','111111','111111','$5$rounds=535000$RzS/Pgqcb62c9aVH$l4Hpa9SpABS5OEXvh2MQH43Cz6gar/iPFm9SI5AMcg.','2018-03-27',0,NULL,NULL,NULL);
+INSERT INTO `employee` VALUES (1,'Luv','luvk1412@gmail.com','Overall','Ceo','BH$ IIIT Allahabad','9803674332','$5$rounds=535000$38RGBfeJwjjpm6B7$yWfNa4RS/GG5cMTF9PBjxjOnlLy/i71g7h5fKtIdBc2','2018-03-26',1,'Amritsar','Punjab','143001','male'),(2,'Luv not admin','luvk1412@gmail.com','Overall','Ceo','1246/1 opposite Tari Halwai, Katra Baghian, Amritsar','9803674332','$5$rounds=535000$JpDXXavvF3k24dlP$hiJh0TZXzLsrpXR0JjxC.M7MFCwbMIHpRGC1JDheTp7','2018-03-27',0,'Amritsar','Punjab','143001','male');
 /*!40000 ALTER TABLE `employee` ENABLE KEYS */;
 UNLOCK TABLES;
 /*!40103 SET TIME_ZONE=@OLD_TIME_ZONE */;
@@ -59,4 +60,4 @@ UNLOCK TABLES;
 /*!40101 SET COLLATION_CONNECTION=@OLD_COLLATION_CONNECTION */;
 /*!40111 SET SQL_NOTES=@OLD_SQL_NOTES */;
 
--- Dump completed on 2018-03-27 14:25:51
+-- Dump completed on 2018-03-27 22:39:56

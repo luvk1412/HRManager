@@ -1,6 +1,40 @@
 @import url(https://fonts.googleapis.com/css?family=Karla);
 @import url(https://fonts.googleapis.com/css?family=Ubuntu:300);
 
+body{
+}
+
+.inputWrapper {
+    height: 32px;
+    width: 180px;
+    overflow: hidden;
+    position: relative;
+    cursor: pointer;
+    display: inline-block;    
+/*    border: 2px solid grey;
+    /*Using a background color, but you can use a background image to represent a button*/
+    background-color: #cccccc;
+    box-shadow: 0 8px 16px 0 rgba(0,0,0,0.2), 0 6px 20px 0 rgba(0,0,0,0.19);
+}
+
+.inputWrapper :hover{
+  box-shadow: 0 12px 16px 0 rgba(0,0,0,0.24),0 17px 50px 0 rgba(0,0,0,0.19);
+}
+.fileInput {
+    cursor: pointer;
+    height: 100%;
+    position:absolute;
+    top: 0;
+    right: 0;
+    z-index: 99;
+    /*This makes the button huge. If you want a bigger button, increase the font size*/
+    font-size:200px;
+    /*Opacity settings for all browsers*/
+    opacity: 0;
+    -moz-opacity: 0;
+    filter:progid:DXImageTransform.Microsoft.Alpha(opacity=0)
+}
+
 .wrap{
   padding:120px 0;
   font-size:62px;
@@ -11,7 +45,7 @@
   text-align:center;
 }
 
-input{
+.logininput{
   font-family:'Ubuntu';
   font-weight:300;
   border:0;
@@ -21,7 +55,7 @@ input{
   font-size:26px;
 }
 
-input:focus{
+.logininput:focus{
   outline:none;
   box-shadow:none;
   background:#ffeae2;
@@ -75,6 +109,7 @@ border-width: 5px;
 
 /* Dropdown Content (Hidden by Default) */
 .dropdown-content {
+    background:#f2f2f2;
     display: none;
     position: absolute;
     min-width: 100px;
@@ -101,3 +136,32 @@ border-width: 5px;
 /* Change the background color of the dropdown button when the dropdown content is shown */
 .dropdown:hover .dropbtn {
 }
+
+
+
+/*Dashborad*/
+
+
+.bg-1 {
+    background-color: #1abc9c; /* Green */
+    color: #ffffff;
+}
+
+.bg-2 {
+  background-color: black;
+    color: #ffffff;
+}
+
+.bg-3 {
+  background-color: grey;
+  color:white;
+}
+
+
+.bg-4 { 
+    background-color: #2f2f2f; /* Black Gray */
+    color: #fff;
+ height: 50px;
+}
+
+/*dashboard */
