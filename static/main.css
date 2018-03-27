@@ -61,6 +61,32 @@ body{
   background:#ffeae2;
 }
 
+.gwrap{
+  padding:120px 0;
+  font-size:62px;
+  color:#888;
+  width:800px;
+  font-family:'Karla';
+  margin:0 auto;
+  text-align:center;
+}
+
+.glogininput{
+  font-family:'Ubuntu';
+  font-weight:300;
+  border:0;
+  border-bottom:1px solid #ff5407;
+  width:400px;
+  height:36px;
+  font-size:26px;
+}
+
+.glogininput:focus{
+  outline:none;
+  box-shadow:none;
+  background:#ffeae2;
+}
+
 button{
   border:0;
   background:transparent;
@@ -165,3 +191,12 @@ border-width: 5px;
 }
 
 /*dashboard */
+
+
+
+
+.attendancebtn{
+  background:#a0a0a0;
+  color:#fff;
+  float:center;
+}

@@ -22,7 +22,7 @@ app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
  
 mysql = MySQL(app)
 
-#UPLOADS
+#Uploads
 
 photos = UploadSet('photos', IMAGES)
 app.config['UPLOADED_PHOTOS_DEST'] = 'static/images'
@@ -66,14 +66,75 @@ def dashboard():
 def view_employee():
 	return render_template('view_employee.html')
 
-@app.route('/attendance')
+@app.route('/attendance', methods=['GET', 'POST'])
 @is_admin_logged_in
 def attendance():
+	if request.method == 'POST':
+		emp_id = request.form['emp_id']
+		cur = mysql.connection.cursor()
+		result = cur.execute("SELECT * FROM employee WHERE id = %s", [emp_id])
+		if result > 0:
+			#finding cur date
+			ts = time.time()
+			timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
+			####
+			result2 = cur.execute("SELECT * FROM attendance WHERE date = %s", [timestamp])
+			flag = 0
+			for i in range(result2):
+				data = cur.fetchone()
+				if data['id'] == int(emp_id):
+					flag = 1
+					break
+			if flag == 1:		
+				error='Today\'s attendance is already marked for this employee'
+				cur.close()
+				return render_template('attendance.html', error=error)
+			else:
+				cur.execute("INSERT INTO attendance(date, id) VALUES(%s, %s)", (timestamp, emp_id))
+				mysql.connection.commit()
+				error='Attendance marked succesfully for employee with Employee id ' + str(emp_id)
+				cur.close()
+				return render_template('attendance.html', msg=error)
+		else:
+			error='Employee id not found'
+			cur.close()
+			return render_template('attendance.html', error=error)
 	return render_template('attendance.html')
 
-@app.route('/incentive')
+@app.route('/incentive', methods=['GET','POST'])
 @is_admin_logged_in
 def incentive():
+	if request.method == 'POST':
+		emp_id = request.form['emp_id']
+		hours = request.form['hours']
+		cur = mysql.connection.cursor()
+		result = cur.execute("SELECT * FROM employee WHERE id = %s", [emp_id])
+		if result > 0:
+			#finding cur date
+			ts = time.time()
+			timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
+			####
+			result2 = cur.execute("SELECT * FROM incentive WHERE date = %s", [timestamp])
+			flag = 0
+			for _ in range(result2):
+				data = cur.fetchone()
+				if data['id'] == int(emp_id):
+					flag = 1
+					break
+			if flag == 1:		
+				error='Today\'s incentive is already added for this employee'
+				cur.close()
+				return render_template('incentive.html', error=error)
+			else:
+				cur.execute("INSERT INTO incentive(date, hours, id) VALUES(%s, %s, %s)", (timestamp, hours, emp_id))
+				mysql.connection.commit()
+				error='Attendance marked succesfully for employee with Employee id ' + str(emp_id)
+				cur.close()
+				return render_template('incentive.html', msg=error)
+		else:
+			error='Employee id not found'
+			cur.close()
+			return render_template('incentive.html', error=error)
 	return render_template('incentive.html')
 
 @app.route('/salary')
@@ -106,18 +167,20 @@ def login():
 				session['logged_in'] = True
 				session['emp_id'] = emp_id
 				session['name'] = data['name']
-				app.logger.info(data['name'])
 				if data['admin'] == 1:
 					session['admin_logged_in'] = True
 					flash('You are now loged in as an Admin', 'success')
 				else:
 					flash('You are now loged in as an employee', 'success')
+				cur.close()
 				return redirect(url_for('dashboard'))
 			else:
 				error='Password does not match, If you don\'t remember Click Forgot Password'
+				cur.close()
 				return render_template('login.html', error=error)
 		else:
 			error='Employee id not found'
+			cur.close()
 			return render_template('login.html', error=error)
 	return render_template('login.html')
 
@@ -130,6 +193,7 @@ def logout():
 
 @app.route('/register')
 def register():
+
 	return render_template('register.html')
 
 
@@ -173,8 +237,10 @@ def add_employee():
 		contact = form.contact.data
 		password = sha256_crypt.encrypt(str(form.password.data))
 		cur = mysql.connection.cursor()
+		#finding cur date
 		ts = time.time()
 		timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
+		####
 		cur.execute("INSERT INTO employee(name, email, department, designation, address, contact, password, reg_date, admin, city, state, pincode, gender) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, 0, %s, %s, %s, %s)", (name, email, department, designation, address, contact, password, timestamp, city, state, pincode, gender))
 		tm_id = int(cur.lastrowid)
 		mysql.connection.commit()

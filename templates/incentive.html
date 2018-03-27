@@ -1,8 +1,18 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<div class="jumbotron text-center">
-	<h1>Welcoem to Human Resource Management</h1>
-	<p class="lead">This Application i y</p>
- </div>
+<div class="gwrap" style="margin-top: 2%;">
+	Add Incentive
+	<form method="POST" action="">
+		<div>
+		<input type='text' class="glogininput" name='emp_id' placeholder='Employee Id'>
+		</div>
+		<div>
+		<input type='text' class="glogininput" name='hours' placeholder='Extra hours Worked'>
+		</div>
+		<div>
+		<button type="submit" class='attendancebtn'>Add Incentive</button>
+		</div>
+	</form>
+</div>
 {% endblock %}
