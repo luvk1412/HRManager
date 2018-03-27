@@ -181,13 +181,6 @@ def add_employee():
 		cur.close()
 		img_new_name = str(tm_id)
 		flag = 0
-		# for i in image:
-		# 	if i=='.':
-		# 		flag = 1
-		# 	if flag==1:
-		# 		img_new_name.append(i)
-		# image = img_new_name
-	#	app.logger.info(img_new_name)
 		if 'profile_image' in request.files:
 			file = request.files['profile_image']
 			file.filename = str(tm_id) + '.jpg'
