@@ -137,9 +137,43 @@ def incentive():
 			return render_template('incentive.html', error=error)
 	return render_template('incentive.html')
 
-@app.route('/salary')
+
+@app.route('/salary', methods=['GET', 'POST'])
 @is_admin_logged_in
 def salary():
+	if request.method == 'POST':
+		emp_id = request.form['emp_id']
+		from_date = request.form['from']
+		to_date = request.form['to']
+		if to_date < from_date:
+			error='To Date cannot be smaller than From date'
+			return render_template('salary.html', error=error)
+		cur = mysql.connection.cursor()
+		result = cur.execute("SELECT * FROM employee WHERE id = %s", [emp_id])
+		if result > 0:
+			emp_data = cur.fetchone()
+			tmp = cur.execute("SELECT * FROM salary WHERE department = %s && designation = %s", (emp_data['department'], emp_data['designation']))
+			salary_data = cur.fetchone()
+			att_ct = cur.execute("SELECT * FROM attendance WHERE id = %s && date >= %s && date <= %s", (emp_id, from_date, to_date))
+			att_ct *= 10
+			tmp2 = cur.execute("SELECT * FROM incentive WHERE id = %s && date >= %s && date <= %s", (emp_id, from_date, to_date))
+			incent_tot = 0
+			for _ in range(tmp2):
+				tmp_data = cur.fetchone()
+				incent_tot += tmp_data['hours']
+			app.logger.info(att_ct)
+			app.logger.info(incent_tot)
+			app.logger.info(salary_data['amount_per_hour'])
+			salary_tot = 0
+			salary_tot += salary_data['amount_per_hour'] * (att_ct + incent_tot)
+			msg='Salary for the employee with id ' + str(emp_data['id']) + ' from ' + from_date + ' to ' + to_date + ' is ' + str(salary_tot)  
+			cur.close()
+			flash(msg, 'success')
+			return render_template('salary.html')		
+		else:
+			error='Employee id not found'
+			cur.close()
+			return render_template('salary.html', error=error)
 	return render_template('salary.html')
 
 @app.route('/about')
@@ -230,6 +264,12 @@ def add_employee():
 		email = form.email.data
 		department = form.department.data
 		designation = form.designation.data
+		if department == 'Overall' and (designation != 'Peon' or designation != 'Ceo'):
+			error='Overall can be Ceo or Peon'
+			return render_template('add_employee.html', form=form, error=error)
+		if department != 'Overall' and (designation == 'Peon' or designation == 'Ceo'):
+			error='Ceo or Peon can only be overall'
+			return render_template('add_employee.html', form=form, error=error)
 		address = form.address.data
 		city = form.city.data
 		state = form.state.data
