@@ -73,6 +73,12 @@ def salary():
 def about():
 	return render_template('about.html')
 
+
+@app.route('/profile')
+@is_logged_in
+def profile():
+	return render_template('profile.html')
+
 @app.route('/login', methods=['GET', 'POST'])
 def login():
 	if request.method == 'POST':
@@ -116,8 +122,8 @@ def register():
 	return render_template('register.html')
 
 class emp_form(Form):
-	name = StringField('Name', [validators.Length(min = 1,max = 50)])
-	email = StringField('Email', [validators.Length(min = 1,max = 50)])
+	name = StringField('Name', [validators.DataRequired(), validators.Length(min = 1,max = 50)])
+	email = StringField('Email', [validators.DataRequired(),validators.Length(min = 1,max = 50)])
 	department = SelectField('Department', choices=[('Overall','Overall'), ('Finance', 'Finance'), ('Research', 'Research'), ('Sales', 'Sales'), ('Marketing', 'Marketing')])
 	designation = SelectField('Designation', choices=[('Ceo', 'Ceo'), ('HOD', 'HOD'), ('Manager', 'Manager'), ('Employee', 'Employee'),  ('Intern', 'Intern'),  ('Peon', 'Peon')])
 	password = PasswordField('Password', [
@@ -126,8 +132,11 @@ class emp_form(Form):
 		validators.EqualTo('confirm', message="Password do not match")
 	])
 	confirm = PasswordField('Confirm Password')
-	address = StringField('Address', [validators.Length(min = 1,max = 500)])
-	contact = StringField('Contact', [validators.Length(min = 1,max = 10)])
+	address = StringField('Address', [validators.DataRequired(),validators.Length(min = 1,max = 500)])
+	city = StringField('City', [validators.DataRequired(),validators.Length(min = 1,max = 50)])
+	state = StringField('State', [validators.DataRequired(),validators.Length(min = 1,max = 50)])
+	pincode = StringField('Pin Code', [validators.DataRequired(),validators.Length(min = 1,max = 10)])
+	contact = StringField('Contact', [validators.DataRequired(),validators.Length(min = 1,max = 10)])
 
 
 @app.route('/employee/add', methods=['GET', 'POST'])
@@ -140,12 +149,15 @@ def add_employee():
 		department = form.department.data
 		designation = form.designation.data
 		address = form.address.data
+		city = form.city.data
+		state = form.state.data
+		pincode = form.pincode.data
 		contact = form.contact.data
 		password = sha256_crypt.encrypt(str(form.password.data))
 		cur = mysql.connection.cursor()
 		ts = time.time()
 		timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
-		cur.execute("INSERT INTO employee(name, email, department, designation, address, contact, password, reg_date, admin) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, 0)", (name, email, department, designation, address, contact, password, timestamp))
+		cur.execute("INSERT INTO employee(name, email, department, designation, address, contact, password, reg_date, admin, city, state, pincode) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, 0, %s, %s, %s)", (name, email, department, designation, address, contact, password, timestamp, city, state, pincode))
 		tm_id = int(cur.lastrowid)
 		mysql.connection.commit()
 		cur.close()
