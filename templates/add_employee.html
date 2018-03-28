@@ -13,6 +13,10 @@
 	        <div class="form-group">
 	            {{ render_field(form.gender, class="form-control") }}
 	        </div>
+	        <div>
+        		<label for="from" style="font-size: 20px;">Date of Birth</label>
+         		<input type="date" class="form-control" name="dob" max="3000-12-31" min="1000-01-01" placeholder='From' style="width:100%;">
+	        </div>
 	        <div class="form-group">
 	            {{ render_field(form.email, class="form-control") }}
 	        </div>

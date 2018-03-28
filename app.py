@@ -98,9 +98,67 @@ def dashboard():
 
 # Employee View
 
-@app.route('/employee/view')
+@app.route('/employee/view', methods=['GET', 'POST'])
 @is_admin_logged_in
 def view_employee():
+	if request.method == 'POST':
+		inst = ""
+		flag = 0
+		if request.form.get('cdepartment'):
+			if flag == 0:
+				inst += " WHERE department='"+request.form['department']+"'"
+				flag = 1
+			else:
+				inst += " && department='"+request.form['department']+"'"
+
+		if request.form.get('cdesignation'):
+			if flag == 0:				
+				inst += " WHERE designation='"+request.form['designation']+"'"
+				flag = 1
+			else:
+				inst += " && designation='"+request.form['designation']+"'"
+		if request.form.get('cage'):
+			age=request.form['age']
+			#finding cur date
+			ts = time.time()
+			tmp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
+			####
+			date = str(int(tmp[:-6]) - int(age)) + tmp[4:]
+			if flag == 0:
+				
+				inst += " WHERE dob>='"+date+"'"
+				flag = 1
+			else:
+				inst += " && dob>='"+date+"'"
+		if request.form.get('cgender'):
+			if flag == 0:
+				inst += " WHERE gender='"+request.form['gender']+"'"
+				flag = 1
+			else:
+				inst += " && gender='"+request.form['gender']+"'"
+
+		if request.form.get('ccity'):
+			if flag == 0:
+				inst += " WHERE city='"+request.form['city']+"'"
+				flag = 1
+			else:
+				inst += " && city='"+request.form['city']+"'"
+		if request.form.get('cstate'):
+			if flag == 0:
+				inst += " WHERE state='"+request.form['state']+"'"
+				flag = 1
+			else:
+				inst += " && state='"+request.form['state']+"'"
+		cur = mysql.connection.cursor()
+		result = cur.execute("SELECT * FROM employee"+inst)
+		if result > 0:
+			employees = cur.fetchall()
+			cur.close()
+			return render_template('view_employee.html', employees=employees)
+		else:
+			msg='No Employee Found'
+			cur.close()
+			return render_template('view_employee.html', error=msg)
 	return render_template('view_employee.html')
 
 
@@ -318,10 +376,13 @@ def add_employee():
 	if request.method == 'POST' and form.validate():
 		name = form.name.data
 		gender = form.gender.data
+		dob = request.form['dob']
+	#	dob="2017-12-14"
+	#	app.logger.info(dob)
 		email = form.email.data
 		department = form.department.data
 		designation = form.designation.data
-		if department == 'Overall' and (designation != 'Peon' or designation != 'Ceo'):
+		if department == 'Overall' and (designation != 'Peon' and designation != 'Ceo'):
 			error='Overall can be Ceo or Peon'
 			return render_template('add_employee.html', form=form, error=error)
 		if department != 'Overall' and (designation == 'Peon' or designation == 'Ceo'):
@@ -338,7 +399,7 @@ def add_employee():
 		ts = time.time()
 		timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
 		####
-		cur.execute("INSERT INTO employee(name, email, department, designation, address, contact, password, reg_date, admin, city, state, pincode, gender) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, 0, %s, %s, %s, %s)", (name, email, department, designation, address, contact, password, timestamp, city, state, pincode, gender))
+		cur.execute("INSERT INTO employee(name, email, department, designation, address, contact, password, reg_date, admin, city, state, pincode, gender, dob) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, 0, %s, %s, %s, %s, %s)", (name, email, department, designation, address, contact, password, timestamp, city, state, pincode, gender, dob))
 		tm_id = int(cur.lastrowid)
 		mysql.connection.commit()
 		cur.close()

@@ -1,6 +1,129 @@
 {% extends 'layout.html' %}
 
 {% block body %}
+	<div class="container" style ="margin-top: 2%;">
+		<h3>Filters</h3>
+		</br>
+		<form id="formId" method="POST" action="">
+			<div class="form-grp">
+				<div class="row">
+					<div class="col-md-6">
+						<label class="label--checkbox">
+							<input type="checkbox" class="checkbox" name="cdepartment">
+						</label>
+						<select id="department" class="custom-select" name="department" style="width:400px;">
+							<option selected>Select Department</option>
+							<option value="Overall">Overall</option>
+							<option value="Finance">Finance</option>
+							<option value="Research">Research</option>
+							<option value="Sales">Sales</option>
+							<option value="Marketing">Marketing</option>
+						</select>
+					</div>
+					<div class="col-md-6">
+						<label class="label--checkbox">
+							<input type="checkbox" class="checkbox" name="cdesignation">
+						</label>
+						<select id="designation" class="custom-select" name="designation" style="width:400px;">
+							<option selected>Select Designation</option>
+							<option value="Ceo">Ceo</option>
+							<option value="HOD">HOD</option>
+							<option value="Manager">Manager</option>
+							<option value="Employee">Employee</option>
+							<option value="Intern">Intern</option>
+							<option value="Peon">Peon</option>
+						</select>
+					</div>
+				</div>
+				<div class="row row2">
+					<div class="col-md-6">
+						<div class="range-slider">
+							<label class="label--checkbox">
+								<input type="checkbox" class="checkbox" name="cage">
+							</label>
+							Age
+							<input class="range-slider__range" name="age" type="range" value="20" min="1" max="70" style = "width: 300px;">
+							<span class="range-slider__value">0</span>
+						</div>
+					</div>
+					<div class="col-md-6">
+					<label class="label--checkbox">
+						<input type="checkbox" class="checkbox" name="cgender">
+					</label>
+					<select id="designation" class="custom-select" name="gender" style="width:400px;">
+					<option selected>Gender</option>
+					<option value="male">male</option>
+					<option value="female">female</option>
+					<option value="other">other</option>		  
+					</select>
+					</div>
+				</div>
+			
+				<div class="row">
+					<div class="col-1 ">
+						<label class="label--checkbox">
+							<input type="checkbox" name="ccity" class="checkbox">
+						</label>
+					</div>
+					<div class="col col1">
+						<input class="form-control" type="text" name="city" placeholder="City" style="width:400px;">
+					</div>
+					<div class="col-1 ">
+						<label class="label--checkbox">
+							<input type="checkbox" name="cstate" class="checkbox">
+						</label>
+					</div>
+					<div class="col col1">
+						<input class="form-control" name="state" type="text" value="" placeholder="State" style="width:400px;">
+					</div>
+				 </div>
+			</div>
+			<button type="submit" class="btn btn-info">Search</button>
+		</form>
+	</div>
+
+	<table class="table table-striped" style="margin-top: 2%;">
+		<tr>
+			<th>Employee ID</th>
+			<th>Name</th>
+			<th></th>
+			<th></th>
+		</tr>
+ 		{% for employee in employees %}
+			<tr>
+				<th>{{employee.id}}</th>
+				<th>{{employee.name}}</th>
+				<th><a href="#" class="btn btn-info pullright">View</a></th>
+				{% if employee.admin %}
+					<th>Already Admin</th>
+				{% else %}
+					<th><a href="#" class="btn btn-danger pullright">Make admin</th>
+				{% endif %}
+			</tr>
+		{% endfor %}
+ 
+	</table>
 
 
+
+	<script type="text/javascript">
+		$('.your-checkbox').prop('indeterminate', true)
+		var rangeSlider = function(){
+			var slider = $('.range-slider'),
+			range = $('.range-slider__range'),
+			value = $('.range-slider__value');
+			slider.each(function(){
+				value.each(function(){
+					var value = $(this).prev().attr('value');
+					$(this).html(value);
+				});
+
+			range.on('input', function(){
+				$(this).next(value).html(this.value);
+				});
+			});
+		};
+
+		rangeSlider();	
+	</script>
 {% endblock %}
