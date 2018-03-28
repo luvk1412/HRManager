@@ -30,7 +30,7 @@ configure_uploads(app, photos)
 
 
 
-
+# Checking autharised acces for non admin lgoin
 def is_logged_in(f):
 	@wraps(f)
 	def wrap(*args, **kwargs):
@@ -41,6 +41,8 @@ def is_logged_in(f):
 			return redirect(url_for('login'))
 	return wrap
 
+
+#cehcking autharised access for admin login
 def is_admin_logged_in(f):
 	@wraps(f)
 	def wrap(*args, **kwargs):
@@ -55,16 +57,36 @@ def is_admin_logged_in(f):
 	return wrap
 
 
-@app.route('/dashboard')
+# Dashboard
+
+@app.route('/dashboard', methods=['GET', 'POST'])
 @is_logged_in
 def dashboard():
+	if request.method == 'POST' and request.id == 'attendance':
+		emp_id = session['emp_id']
+		from_date = request.form['from']
+		to_date = request.form['to']
+		if to_date < from_date:
+			error='To Date cannot be smaller than From date'
+			return render_template('salary.html', error=error)
+		cur = mysql.connection.cursor()
+		att_ct = cur.execute("SELECT * FROM attendance WHERE id = %s && date >= %s && date <= %s", (emp_id, from_date, to_date))
+		msg='Your attendance from ' + from_date + ' to ' + to_date + ' is ' + str(att_ct)
+		cur.close()
+		flash(msg, 'info')
+		return render_template('dashboard.html')
 	return render_template('dashboard.html')
 
+
+# Employee View
 
 @app.route('/employee/view')
 @is_admin_logged_in
 def view_employee():
 	return render_template('view_employee.html')
+
+
+# Attendance
 
 @app.route('/attendance', methods=['GET', 'POST'])
 @is_admin_logged_in
@@ -100,6 +122,9 @@ def attendance():
 			cur.close()
 			return render_template('attendance.html', error=error)
 	return render_template('attendance.html')
+
+
+# Incentive
 
 @app.route('/incentive', methods=['GET','POST'])
 @is_admin_logged_in
@@ -138,6 +163,8 @@ def incentive():
 	return render_template('incentive.html')
 
 
+# calculate salary
+
 @app.route('/salary', methods=['GET', 'POST'])
 @is_admin_logged_in
 def salary():
@@ -168,7 +195,7 @@ def salary():
 			salary_tot += salary_data['amount_per_hour'] * (att_ct + incent_tot)
 			msg='Salary for the employee with id ' + str(emp_data['id']) + ' from ' + from_date + ' to ' + to_date + ' is ' + str(salary_tot)  
 			cur.close()
-			flash(msg, 'success')
+			flash(msg, 'info')
 			return render_template('salary.html')		
 		else:
 			error='Employee id not found'
@@ -176,15 +203,23 @@ def salary():
 			return render_template('salary.html', error=error)
 	return render_template('salary.html')
 
+
+#About page
+
 @app.route('/about')
 def about():
 	return render_template('about.html')
 
 
+#profile page
+
 @app.route('/profile')
 @is_logged_in
 def profile():
 	return render_template('profile.html')
+
+
+#login page
 
 @app.route('/login', methods=['GET', 'POST'])
 def login():
@@ -219,21 +254,25 @@ def login():
 	return render_template('login.html')
 
 
+# logout
+
 @app.route('/logout')
 def logout():
 	session.clear()
 	flash('You are now logged out', 'success')
 	return redirect(url_for('login'))
 
+
+
+
 @app.route('/register')
 def register():
-
 	return render_template('register.html')
 
 
 
-
-
+# Add employee
+			# Employee form
 class emp_form(Form):
 	name = StringField('Name', [validators.DataRequired(), validators.Length(min = 1,max = 50)])
 	gender=SelectField('Gender', choices=[('male','male'), ('female','female'), ('other', 'other')])
@@ -253,7 +292,7 @@ class emp_form(Form):
 	contact = StringField('Contact', [validators.DataRequired(),validators.Length(min = 1,max = 10)])
 
 
-
+			#Addtion
 @app.route('/employee/add', methods=['GET', 'POST'])
 @is_admin_logged_in
 def add_employee():
@@ -298,6 +337,8 @@ def add_employee():
 
 
 
+
+# Main
 
 
 if __name__ == '__main__':

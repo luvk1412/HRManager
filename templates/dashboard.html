@@ -8,10 +8,31 @@
 
 </div>
 
-<div class= "jumbotron text-center">
-	<h3 align=left>Attendance</h3>
-	<h3 align=left>Incentives</h3>
+<div class= "jumbotron">
+	<div>
+		<h3 align=left>Attendance</h3>
+		<form method="POST" action="" id="attendance">
+			<div>
+				<label for="from" style="font-size: 20px;">From</label>
+		 		<input type="date" class="form-control" name="from" max="3000-12-31" min="1000-01-01" placeholder='From' style="width:400px;">
+				<label for="from" style="font-size: 20px;">To</label>
+		 		<input type="date" class="form-control" name="to" max="3000-12-31" min="1000-01-01" placeholder='to' style="width:400px;">
+				<button type="submit" class='attendancebtn'>Get Info</button>
+			</div>
+	</div>
 </div>
-    
+<div class= "jumbotron">
+	<div>
+		<h3 align=left>Incentive</h3>
+		<form method="POST" action="" id="incentive">
+			<div>
+				<label for="from" style="font-size: 20px;">From</label>
+		 		<input type="date" class="form-control" name="from" max="3000-12-31" min="1000-01-01" placeholder='From' style="width:400px;">
+				<label for="from" style="font-size: 20px;">To</label>
+		 		<input type="date" class="form-control" name="to" max="3000-12-31" min="1000-01-01" placeholder='to' style="width:400px;">
+				<button type="submit" class='attendancebtn'>Get Info</button>
+			</div>
+	</div>
+</div>
     
 {% endblock %}
