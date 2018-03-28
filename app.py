@@ -62,19 +62,37 @@ def is_admin_logged_in(f):
 @app.route('/dashboard', methods=['GET', 'POST'])
 @is_logged_in
 def dashboard():
-	if request.method == 'POST' and request.id == 'attendance':
+	if request.method == 'POST':
 		emp_id = session['emp_id']
-		from_date = request.form['from']
-		to_date = request.form['to']
-		if to_date < from_date:
-			error='To Date cannot be smaller than From date'
-			return render_template('salary.html', error=error)
 		cur = mysql.connection.cursor()
-		att_ct = cur.execute("SELECT * FROM attendance WHERE id = %s && date >= %s && date <= %s", (emp_id, from_date, to_date))
-		msg='Your attendance from ' + from_date + ' to ' + to_date + ' is ' + str(att_ct)
-		cur.close()
-		flash(msg, 'info')
-		return render_template('dashboard.html')
+		if request.form['btn'] == 'attendance':
+			from_date = request.form['from']
+			to_date = request.form['to']
+			if to_date < from_date:
+				error='To Date cannot be smaller than From date'
+				return render_template('dashboard.html', error=error)
+			att_ct = cur.execute("SELECT * FROM attendance WHERE id = %s && date >= %s && date <= %s", (emp_id, from_date, to_date))
+			msg='Your attendance from ' + from_date + ' to ' + to_date + ' is ' + str(att_ct) + ' days !!'
+			cur.close()
+			flash(msg, 'info')
+			return render_template('dashboard.html')
+		elif request.form['btn'] == 'incentive':
+			from_date = request.form['fromm']
+			to_date = request.form['too']
+			if to_date < from_date:
+				error='To Date cannot be smaller than From date'
+				return render_template('dashboard.html', error=error)
+			app.logger.info(from_date)
+			app.logger.info(to_date)
+			tmp2 = cur.execute("SELECT * FROM incentive WHERE id = %s && date >= %s && date <= %s", (emp_id, from_date, to_date))
+			incent_tot = 0
+			for _ in range(tmp2):
+				tmp_data = cur.fetchone()
+				incent_tot += tmp_data['hours']
+			msg='Your incentive from ' + from_date + ' to ' + to_date + ' is ' + str(incent_tot) + ' hours !!'
+			cur.close()
+		#	flash(msg, 'info')
+			return render_template('dashboard.html', msg=msg)		
 	return render_template('dashboard.html')
 
 
@@ -188,9 +206,9 @@ def salary():
 			for _ in range(tmp2):
 				tmp_data = cur.fetchone()
 				incent_tot += tmp_data['hours']
-			app.logger.info(att_ct)
-			app.logger.info(incent_tot)
-			app.logger.info(salary_data['amount_per_hour'])
+		#	app.logger.info(att_ct)
+		#	app.logger.info(incent_tot)
+		#	app.logger.info(salary_data['amount_per_hour'])
 			salary_tot = 0
 			salary_tot += salary_data['amount_per_hour'] * (att_ct + incent_tot)
 			msg='Salary for the employee with id ' + str(emp_data['id']) + ' from ' + from_date + ' to ' + to_date + ' is ' + str(salary_tot)  
