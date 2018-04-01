@@ -7,11 +7,11 @@
       <img class="rounded-circle" src="/static/images/{{employee.id}}.jpg" height="200px">
       <h3>{{employee.name}}</h3>
       <h4>{{employee.designation}}, {{employee.department}}</h4>
-      <div style="visibility: hidden" id="editfunction" data-sid="{{session.emp_id}}" data-eid="{{employee.id}}">
-      <button class="btn btn-info">Edit Profile</button>
-      <button type = "button" class="btn btn-info" name = "btn" value = "change_password" onclick="window.open('/change_password', '_top');">Change Password</button>
-      </div>
-<!-- <h4>{{session.department}}</h4> -->
+      {% if session.emp_id==employee.id %}
+        <button class="btn btn-info">Edit Profile</button>
+        <button type="button" class="btn btn-info" name="btn" value="change_password" onclick="window.open('/change_password', '_top');">Change Password</button>
+      {% endif %}
+      
 </div>
 
 <div class= "jumbotron">
@@ -35,15 +35,6 @@
 
 <script>
 
-$( document ).ready(function() {
-    console.log( "ready!" );
-    var sid=parseInt(document.getElementById("editfunction").dataset.sid);
-    var eid=parseInt(document.getElementById("editfunction").dataset.eid);
-    if(sid===eid){
-      document.getElementById("editfunction").style.visibility='visible';
-    }
-    console.log(sid,eid);
-});
 
 $(document).ready(function(){
   var gendervar = document.getElementById("gendervar").dataset.gendervar;

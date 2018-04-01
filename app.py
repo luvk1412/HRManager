@@ -369,11 +369,7 @@ class check_password(Form):
 def change_password():
 	form = check_password(request.form)
 	if request.method == 'POST'and form.validate():
-		app.logger.info("HI")
 		emp_id = session['emp_id']
-		# old_password = request.form['old_password']
-		# new_password = request.form['new_password']
-		# confirm_newpassword = request.form['confirm_new']
 		old_password = form.old_password.data
 		new_password = sha256_crypt.encrypt(str(form.new_password.data))
 
@@ -384,8 +380,6 @@ def change_password():
 			password = data['password']
 			if sha256_crypt.verify(old_password, password):
 				error='Password Match'
-				# session['logged_in'] = True
-				# if new_password == confirm_newpassword:
 				result2 = cur.execute("UPDATE employee SET password = %s WHERE id = %s", (new_password, emp_id))
 				mysql.connection.commit()
 				cur.close()
@@ -436,7 +430,7 @@ class emp_form(Form):
 
 
 
-			#Addtion
+#Addtion
 @app.route('/employee/add', methods=['GET', 'POST'])
 @is_admin_logged_in
 def add_employee():
