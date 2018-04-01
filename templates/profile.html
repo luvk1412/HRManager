@@ -3,10 +3,14 @@
 {% block body %}
 
 <div class="jumbotron text-center" style="margin-top: 2%; font-family:'Karla';">
-      <h1 align=left><b>Dashboard</b></h1></br>
-      <img class="rounded-circle" src="/static/images/{{session.emp_id}}.jpg" height="200px">
-      <h3>{{session.name}}</h3>
+      <h1 align=left><b>Your profile</b></h1></br>
+      <img class="rounded-circle" src="/static/images/{{employee.id}}.jpg" height="200px">
+      <h3>{{employee.name}}</h3>
       <h4>{{employee.designation}}, {{employee.department}}</h4>
+      <div style="visibility: hidden" id="editfunction" data-sid="{{session.emp_id}}" data-eid="{{employee.id}}">
+      <button class="btn btn-info">Edit Profile</button>
+      <button class="btn btn-info">Change Password</button>
+      </div>
 <!-- <h4>{{session.department}}</h4> -->
 </div>
 
@@ -28,6 +32,7 @@
   <h5 align=left><b>Location : {{employee.address}}</b></h5>
 </div>
 
+<<<<<<< HEAD
 
 <script>
 $(document).ready(function(){
@@ -35,5 +40,18 @@ $(document).ready(function(){
   gendervar = gendervar.charAt(0).toUpperCase() + gendervar.slice(1);
   document.getElementById("gendervar").innerHTML = '<b>Gender :  '+gendervar+'</b>'
 });
+=======
+<script>
+$( document ).ready(function() {
+    console.log( "ready!" );
+    var sid=parseInt(document.getElementById("editfunction").dataset.sid);
+    var eid=parseInt(document.getElementById("editfunction").dataset.eid);
+    if(sid===eid){
+      document.getElementById("editfunction").style.visibility='visible';
+    }
+    console.log(sid,eid);  
+});
+  
+>>>>>>> b8255b5282e3252503080daa2a21886a5fb15030
 </script>
 {% endblock %}
