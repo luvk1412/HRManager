@@ -292,7 +292,7 @@ def about():
 @app.route('/profile/<string:id>', methods=['GET', 'POST'])
 @is_logged_in
 def profile(id):
-#	emp_id = session['emp_id']
+	#emp_id = session['emp_id']
 	emp_id = id
 	cur = mysql.connection.cursor()
 	result = cur.execute("SELECT * FROM employee WHERE id = %s", [emp_id])
@@ -319,7 +319,7 @@ def login():
 			if sha256_crypt.verify(password_candidate, password):
 				error='Logged in succesfully'
 				session['logged_in'] = True
-				session['emp_id'] = int(emp_id)
+				session['emp_id'] = emp_id
 				session['name'] = data['name']
 				if data['admin'] == 1:
 					session['admin_logged_in'] = True
@@ -348,6 +348,56 @@ def logout():
 	return redirect(url_for('login'))
 
 
+class check_password(Form):
+	old_password = PasswordField('Old Password', [
+			validators.DataRequired(),
+			validators.Length(min = 5,max = 50)
+		])
+	new_password = PasswordField('New Password', [
+		validators.DataRequired(),
+		validators.Length(min = 5,max = 50),
+		validators.EqualTo('confirm_newpassword', message="Password do not match")
+	])
+	confirm_newpassword = PasswordField('Confirm Password')
+
+@app.route('/change_password', methods=['GET','POST'])
+@is_logged_in
+def change_password():
+	form = check_password(request.form)
+	if request.method == 'POST'and form.validate():
+		app.logger.info("HI")
+		emp_id = session['emp_id']
+		# old_password = request.form['old_password']
+		# new_password = request.form['new_password']
+		# confirm_newpassword = request.form['confirm_new']
+		old_password = form.old_password.data
+		new_password = sha256_crypt.encrypt(str(form.new_password.data))
+
+		cur = mysql.connection.cursor()
+		result = cur.execute("SELECT * FROM employee WHERE id = %s", [emp_id])
+		if result > 0:
+			data = cur.fetchone()
+			password = data['password']
+			if sha256_crypt.verify(old_password, password):
+				error='Password Match'
+				# session['logged_in'] = True
+				# if new_password == confirm_newpassword:
+				result2 = cur.execute("UPDATE employee SET password = %s WHERE id = %s", (new_password, emp_id))
+				mysql.connection.commit()
+				cur.close()
+				error = "Password Changed Successfully"
+				flash(error, 'success')
+				return redirect('/profile/'+str(emp_id))
+			else:
+				error='Password does not match, If you don\'t remember Click Forgot Password'
+				cur.close()
+				return render_template('change_password.html', form = form, error=error)
+		else:
+			error='Employee id not found'
+			cur.close()
+			return render_template('change_password.html', form = form, error=error)
+	return render_template('change_password.html', form = form)
+
 
 
 @app.route('/register')
@@ -375,6 +425,9 @@ class emp_form(Form):
 	state = StringField('State', [validators.DataRequired(),validators.Length(min = 1,max = 50)])
 	pincode = StringField('Pin Code', [validators.DataRequired(),validators.Length(min = 1,max = 10)])
 	contact = StringField('Contact', [validators.DataRequired(),validators.Length(min = 1,max = 10)])
+
+
+
 
 
 			#Addtion

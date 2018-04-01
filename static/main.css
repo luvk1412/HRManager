@@ -13,7 +13,7 @@ body{
     overflow: hidden;
     position: relative;
     cursor: pointer;
-    display: inline-block;    
+    display: inline-block;
 /*    border: 2px solid grey;
     /*Using a background color, but you can use a background image to represent a button*/
     background-color: #cccccc;
@@ -196,7 +196,7 @@ border-width: 5px;
 }
 
 
-.bg-4 { 
+.bg-4 {
     background-color: #2f2f2f; /* Black Gray */
     color: #fff;
  height: 50px;
@@ -306,7 +306,7 @@ border-width: 5px;
    color: #eee;
    border: 2px solid transparent;
 }
- 
+
 
 
 
@@ -511,7 +511,3 @@ input::-moz-focus-inner, input::-moz-focus-outer {
     transform: translateY(0);
   }
 }
-
-
-
-

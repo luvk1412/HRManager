@@ -9,7 +9,7 @@
       <h4>{{employee.designation}}, {{employee.department}}</h4>
       <div style="visibility: hidden" id="editfunction" data-sid="{{session.emp_id}}" data-eid="{{employee.id}}">
       <button class="btn btn-info">Edit Profile</button>
-      <button class="btn btn-info">Change Password</button>
+      <button type = "button" class="btn btn-info" name = "btn" value = "change_password" onclick="window.open('/change_password', '_top');">Change Password</button>
       </div>
 <!-- <h4>{{session.department}}</h4> -->
 </div>
