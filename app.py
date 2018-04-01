@@ -2,7 +2,7 @@ from flask import Flask, render_template, flash, redirect, request, url_for, ses
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators, SelectField,FileField
 from flask_wtf.file import FileField
 from passlib.hash import sha256_crypt
-from functools import wraps 
+from functools import wraps
 from flask_mysqldb import MySQL
 import datetime, time
 from werkzeug import secure_filename
@@ -14,12 +14,12 @@ app = Flask(__name__, static_url_path='/static')
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '123456'
+app.config['MYSQL_PASSWORD'] = 'iiita123'
 app.config['MYSQL_DB'] = 'hrmanager'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
 #init MYSQL
- 
+
 mysql = MySQL(app)
 
 #Uploads
@@ -92,7 +92,7 @@ def dashboard():
 			msg='Your incentive from ' + from_date + ' to ' + to_date + ' is ' + str(incent_tot) + ' hours !!'
 			cur.close()
 		#	flash(msg, 'info')
-			return render_template('dashboard.html', msg=msg)		
+			return render_template('dashboard.html', msg=msg)
 	return render_template('dashboard.html')
 
 
@@ -112,7 +112,7 @@ def view_employee():
 				inst += " && department='"+request.form['department']+"'"
 
 		if request.form.get('cdesignation'):
-			if flag == 0:				
+			if flag == 0:
 				inst += " WHERE designation='"+request.form['designation']+"'"
 				flag = 1
 			else:
@@ -125,7 +125,7 @@ def view_employee():
 			####
 			date = str(int(tmp[:-6]) - int(age)) + tmp[4:]
 			if flag == 0:
-				
+
 				inst += " WHERE dob>='"+date+"'"
 				flag = 1
 			else:
@@ -183,7 +183,7 @@ def attendance():
 				if data['id'] == int(emp_id):
 					flag = 1
 					break
-			if flag == 1:		
+			if flag == 1:
 				error='Today\'s attendance is already marked for this employee'
 				cur.close()
 				return render_template('attendance.html', error=error)
@@ -222,7 +222,7 @@ def incentive():
 				if data['id'] == int(emp_id):
 					flag = 1
 					break
-			if flag == 1:		
+			if flag == 1:
 				error='Today\'s incentive is already added for this employee'
 				cur.close()
 				return render_template('incentive.html', error=error)
@@ -269,10 +269,10 @@ def salary():
 		#	app.logger.info(salary_data['amount_per_hour'])
 			salary_tot = 0
 			salary_tot += salary_data['amount_per_hour'] * (att_ct + incent_tot)
-			msg='Salary for the employee with id ' + str(emp_data['id']) + ' from ' + from_date + ' to ' + to_date + ' is ' + str(salary_tot)  
+			msg='Salary for the employee with id ' + str(emp_data['id']) + ' from ' + from_date + ' to ' + to_date + ' is ' + str(salary_tot)
 			cur.close()
 			flash(msg, 'info')
-			return render_template('salary.html')		
+			return render_template('salary.html')
 		else:
 			error='Employee id not found'
 			cur.close()
@@ -289,10 +289,18 @@ def about():
 
 #profile page
 
-@app.route('/profile')
+@app.route('/profile', methods=['GET', 'POST'])
 @is_logged_in
 def profile():
-	return render_template('profile.html')
+	emp_id = session['emp_id']
+	cur = mysql.connection.cursor()
+	result = cur.execute("SELECT * FROM employee WHERE id = %s", [emp_id])
+	if result > 0:
+		employee = cur.fetchone()
+		cur.close()
+		return render_template('profile.html', employee=employee)
+	error='Employee Not found'
+	return render_template('profile.html', error=error)
 
 
 #login page
@@ -312,6 +320,8 @@ def login():
 				session['logged_in'] = True
 				session['emp_id'] = emp_id
 				session['name'] = data['name']
+				session['designation'] = data['designation']
+				session['department'] = data['department']
 				if data['admin'] == 1:
 					session['admin_logged_in'] = True
 					flash('You are now loged in as an Admin', 'success')
@@ -423,4 +433,3 @@ def add_employee():
 if __name__ == '__main__':
 	app.secret_key='123456'
 	app.run(debug=True)
-	 

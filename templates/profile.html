@@ -2,6 +2,30 @@
 
 {% block body %}
 
+<div class="jumbotron text-center" style="margin-top: 2%; font-family:'Karla';">
+      <h1 align=left><b>Dashboard</b></h1></br>
+      <img class="rounded-circle" src="/static/images/{{session.emp_id}}.jpg" height="200px">
+      <h3>{{session.name}}</h3>
+      <h4>{{employee.designation}}, {{employee.department}}</h4>
+<!-- <h4>{{session.department}}</h4> -->
+</div>
 
+<div class= "jumbotron">
+	<h3 align=left><b>Personal Information</b></h3>
+<br>
+  <h5 align=left><b>Gender :  {{employee.gender}} </b></h5>
+  <h5 align=left><b>Birthday : {{employee.dob}}</b></h5>
+  <h5 align=left><b>Nationality : {{employee.gender}}</b{{employee.gender}}></h5>
+  <h5 align=left><b>Blood Group : {{employee.gender}}</b></h5>
+  <h5 align=left><b>Marital Status : {{employee.gender}}</b></h5>
+</div>
+
+<div class= "jumbotron">
+	<h3 align=left><b>Contact Details</b></h3>
+<br>
+  <h5 align=left><b>Mobile Number : {{employee.contact}}</b></h5>
+  <h5 align=left><b>E-mail : {{employee.email}}</b></h5>
+  <h5 align=left><b>Location : {{employee.address}}</b></h5>
+</div>
 
 {% endblock %}
