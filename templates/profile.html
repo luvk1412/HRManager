@@ -32,16 +32,9 @@
   <h5 align=left><b>Location : {{employee.address}}</b></h5>
 </div>
 
-<<<<<<< HEAD
 
 <script>
-$(document).ready(function(){
-  var gendervar = document.getElementById("gendervar").dataset.gendervar;
-  gendervar = gendervar.charAt(0).toUpperCase() + gendervar.slice(1);
-  document.getElementById("gendervar").innerHTML = '<b>Gender :  '+gendervar+'</b>'
-});
-=======
-<script>
+
 $( document ).ready(function() {
     console.log( "ready!" );
     var sid=parseInt(document.getElementById("editfunction").dataset.sid);
@@ -49,9 +42,16 @@ $( document ).ready(function() {
     if(sid===eid){
       document.getElementById("editfunction").style.visibility='visible';
     }
-    console.log(sid,eid);  
+    console.log(sid,eid);
 });
-  
->>>>>>> b8255b5282e3252503080daa2a21886a5fb15030
+
+$(document).ready(function(){
+  var gendervar = document.getElementById("gendervar").dataset.gendervar;
+  gendervar = gendervar.charAt(0).toUpperCase() + gendervar.slice(1);
+  document.getElementById("gendervar").innerHTML = '<b>Gender :  '+gendervar+'</b>'
+});
+
+
+
 </script>
 {% endblock %}
