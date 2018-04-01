@@ -14,7 +14,7 @@ app = Flask(__name__, static_url_path='/static')
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'iiita123'
+app.config['MYSQL_PASSWORD'] = '123456'
 app.config['MYSQL_DB'] = 'hrmanager'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
@@ -27,7 +27,7 @@ mysql = MySQL(app)
 photos = UploadSet('photos', IMAGES)
 app.config['UPLOADED_PHOTOS_DEST'] = 'static/images'
 configure_uploads(app, photos)
-
+login = False
 
 
 # Checking autharised acces for non admin lgoin
@@ -55,6 +55,9 @@ def is_admin_logged_in(f):
 			flash('Unautharized, Please Login', 'danger')
 			return redirect(url_for('login'))
 	return wrap
+
+
+
 
 
 # Dashboard
@@ -150,7 +153,7 @@ def view_employee():
 			else:
 				inst += " && state='"+request.form['state']+"'"
 		cur = mysql.connection.cursor()
-		result = cur.execute("SELECT * FROM employee"+inst)
+		result = cur.execute("SELECT * FROM e_v"+inst)
 		if result > 0:
 			employees = cur.fetchall()
 			cur.close()
@@ -295,7 +298,7 @@ def profile(id):
 #	emp_id = session['emp_id']
 	emp_id = id
 	cur = mysql.connection.cursor()
-	result = cur.execute("SELECT * FROM employee WHERE id = %s", [emp_id])
+	result = cur.execute("SELECT * FROM e_v WHERE id = %s", [emp_id])
 	if result > 0:
 		employee = cur.fetchone()
 		cur.close()
@@ -319,6 +322,7 @@ def login():
 			if sha256_crypt.verify(password_candidate, password):
 				error='Logged in succesfully'
 				session['logged_in'] = True
+				login = True
 				session['emp_id'] = int(emp_id)
 				session['name'] = data['name']
 				if data['admin'] == 1:
@@ -344,6 +348,7 @@ def login():
 @app.route('/logout')
 def logout():
 	session.clear()
+	login=False
 	flash('You are now logged out', 'success')
 	return redirect(url_for('login'))
 
@@ -373,6 +378,8 @@ class emp_form(Form):
 	address = StringField('Address', [validators.DataRequired(),validators.Length(min = 1,max = 500)])
 	city = StringField('City', [validators.DataRequired(),validators.Length(min = 1,max = 50)])
 	state = StringField('State', [validators.DataRequired(),validators.Length(min = 1,max = 50)])
+	nationality = StringField('Nationality', [validators.DataRequired(),validators.Length(min = 1,max = 50)])
+	
 	pincode = StringField('Pin Code', [validators.DataRequired(),validators.Length(min = 1,max = 10)])
 	contact = StringField('Contact', [validators.DataRequired(),validators.Length(min = 1,max = 10)])
 
@@ -400,6 +407,7 @@ def add_employee():
 		address = form.address.data
 		city = form.city.data
 		state = form.state.data
+		nationality = form.nationality.data
 		pincode = form.pincode.data
 		contact = form.contact.data
 		password = sha256_crypt.encrypt(str(form.password.data))
@@ -408,8 +416,14 @@ def add_employee():
 		ts = time.time()
 		timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
 		####
-		cur.execute("INSERT INTO employee(name, email, department, designation, address, contact, password, reg_date, admin, city, state, pincode, gender, dob) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, 0, %s, %s, %s, %s, %s)", (name, email, department, designation, address, contact, password, timestamp, city, state, pincode, gender, dob))
-		tm_id = int(cur.lastrowid)
+		cur.execute("INSERT INTO employee(name, email, department, designation, address, contact, password, reg_date, admin, city, pincode, gender, dob) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, 0, %s, %s, %s, %s)", (name, email, department, designation, address, contact, password, timestamp, city, pincode, gender, dob))
+		tm_id = int(cur.lastrowid)		
+		result = cur.execute("SELECT * FROM city_state WHERE city=%s",[city]);
+		if result==0:
+			cur.execute("INSERT INTO city_state(city,state) VALUES (%s,%s)", (city,state))
+		result = cur.execute("SELECT * FROM state_nationality WHERE state=%s",[state]);
+		if result==0:
+			cur.execute("INSERT INTO state_nationality(state,nationality) VALUES (%s,%s)", (state, nationality))
 		mysql.connection.commit()
 		cur.close()
 		img_new_name = str(tm_id)
@@ -422,6 +436,14 @@ def add_employee():
 		return redirect(url_for('add_employee'))
 	return render_template('add_employee.html', form=form)
 
+
+
+@app.route('/')
+def index():
+	if login==True:
+		return redirect(url_for('dashboard'))
+	else:
+		return redirect(url_for('login'))
 
 
 
