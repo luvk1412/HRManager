@@ -14,7 +14,7 @@ app = Flask(__name__, static_url_path='/static')
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = 'iiita123'
+app.config['MYSQL_PASSWORD'] = '123456'
 app.config['MYSQL_DB'] = 'hrmanager'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
@@ -289,10 +289,11 @@ def about():
 
 #profile page
 
-@app.route('/profile', methods=['GET', 'POST'])
+@app.route('/profile/<string:id>', methods=['GET', 'POST'])
 @is_logged_in
-def profile():
-	emp_id = session['emp_id']
+def profile(id):
+#	emp_id = session['emp_id']
+	emp_id = id
 	cur = mysql.connection.cursor()
 	result = cur.execute("SELECT * FROM employee WHERE id = %s", [emp_id])
 	if result > 0:
@@ -318,10 +319,8 @@ def login():
 			if sha256_crypt.verify(password_candidate, password):
 				error='Logged in succesfully'
 				session['logged_in'] = True
-				session['emp_id'] = emp_id
+				session['emp_id'] = int(emp_id)
 				session['name'] = data['name']
-				session['designation'] = data['designation']
-				session['department'] = data['department']
 				if data['admin'] == 1:
 					session['admin_logged_in'] = True
 					flash('You are now loged in as an Admin', 'success')

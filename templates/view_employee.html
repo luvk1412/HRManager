@@ -93,11 +93,11 @@
 			<tr>
 				<th>{{employee.id}}</th>
 				<th>{{employee.name}}</th>
-				<th><a href="#" class="btn btn-info pullright">View</a></th>
+				<th><a href="/profile/{{employee.id}}" class="btn btn-info pull-left">View</a></th>
 				{% if employee.admin %}
 					<th>Already Admin</th>
 				{% else %}
-					<th><a href="#" class="btn btn-danger pullright">Make admin</th>
+					<th><a href="#" class="btn btn-danger">Make admin</th>
 				{% endif %}
 			</tr>
 		{% endfor %}
