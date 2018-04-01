@@ -75,7 +75,15 @@ body{
 
 .gwrap{
   padding:120px 0;
-  font-size:62px;
+  font-size:20px;
+  color:#888;
+  width:800px;
+  font-family:'Karla';
+  margin:0 auto;
+  text-align:center;
+}
+.gwrapforchange{
+  font-size:20px;
   color:#888;
   width:800px;
   font-family:'Karla';
@@ -84,6 +92,9 @@ body{
 }
 
 .glogininput{
+  display: block;
+  margin-right: auto;
+  margin-left: auto;
   font-family:'Ubuntu';
   font-weight:300;
   border:0;

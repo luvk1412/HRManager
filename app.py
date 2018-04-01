@@ -301,6 +301,7 @@ def profile(id):
 	result = cur.execute("SELECT * FROM e_v WHERE id = %s", [emp_id])
 	if result > 0:
 		employee = cur.fetchone()
+		employee['id'] = str(employee['id'])
 		cur.close()
 		return render_template('profile.html', employee=employee)
 	error='Employee Not found'
@@ -353,16 +354,16 @@ def logout():
 
 
 class check_password(Form):
-	old_password = PasswordField('Old Password', [
+	old_password = PasswordField('', [
 			validators.DataRequired(),
 			validators.Length(min = 5,max = 50)
-		])
-	new_password = PasswordField('New Password', [
+		],render_kw={"placeholder": "Old Password"})
+	new_password = PasswordField('', [
 		validators.DataRequired(),
 		validators.Length(min = 5,max = 50),
 		validators.EqualTo('confirm_newpassword', message="Password do not match")
-	])
-	confirm_newpassword = PasswordField('Confirm Password')
+	],render_kw={"placeholder": "New Password"})
+	confirm_newpassword = PasswordField('',render_kw={"placeholder": "Confirm New Password"})
 
 @app.route('/change_password', methods=['GET','POST'])
 @is_logged_in
