@@ -408,24 +408,24 @@ def register():
 # Add employee
 			# Employee form
 class emp_form(Form):
-	name = StringField('Name', [validators.DataRequired(), validators.Length(min = 1,max = 50)])
-	gender=SelectField('Gender', choices=[('male','male'), ('female','female'), ('other', 'other')])
-	email = StringField('Email', [validators.DataRequired(),validators.Length(min = 1,max = 50)])
-	department = SelectField('Department', choices=[('Overall','Overall'), ('Finance', 'Finance'), ('Research', 'Research'), ('Sales', 'Sales'), ('Marketing', 'Marketing')])
-	designation = SelectField('Designation', choices=[('Ceo', 'Ceo'), ('HOD', 'HOD'), ('Manager', 'Manager'), ('Employee', 'Employee'),  ('Intern', 'Intern'),  ('Peon', 'Peon')])
+	name = StringField('Name', [validators.DataRequired(), validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+	gender=SelectField('Gender', choices=[('male','male'), ('female','female'), ('other', 'other')],render_kw={"required": ""})
+	email = StringField('Email', [validators.DataRequired(),validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+	department = SelectField('Department', choices=[('Overall','Overall'), ('Finance', 'Finance'), ('Research', 'Research'), ('Sales', 'Sales'), ('Marketing', 'Marketing')],render_kw={"required": ""})
+	designation = SelectField('Designation', choices=[('Ceo', 'Ceo'), ('HOD', 'HOD'), ('Manager', 'Manager'), ('Employee', 'Employee'),  ('Intern', 'Intern'),  ('Peon', 'Peon')],render_kw={"required": ""})
 	password = PasswordField('Password', [
 		validators.DataRequired(),
 		validators.Length(min = 5,max = 50),
 		validators.EqualTo('confirm', message="Password do not match")
-	])
-	confirm = PasswordField('Confirm Password')
-	address = StringField('Address', [validators.DataRequired(),validators.Length(min = 1,max = 500)])
-	city = StringField('City', [validators.DataRequired(),validators.Length(min = 1,max = 50)])
-	state = StringField('State', [validators.DataRequired(),validators.Length(min = 1,max = 50)])
-	nationality = StringField('Nationality', [validators.DataRequired(),validators.Length(min = 1,max = 50)])
+	],render_kw={"required": ""})
+	confirm = PasswordField('Confirm Password',render_kw={"required": ""})
+	address = StringField('Address', [validators.DataRequired(),validators.Length(min = 1,max = 500)],render_kw={"required": ""})
+	city = StringField('City', [validators.DataRequired(),validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+	state = StringField('State', [validators.DataRequired(),validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+	nationality = StringField('Nationality', [validators.DataRequired(),validators.Length(min = 1,max = 50)],render_kw={"required": ""})
 
-	pincode = StringField('Pin Code', [validators.DataRequired(),validators.Length(min = 1,max = 10)])
-	contact = StringField('Contact', [validators.DataRequired(),validators.Length(min = 1,max = 10)])
+	pincode = StringField('Pin Code', [validators.DataRequired(),validators.Length(min = 1,max = 10)],render_kw={"required": ""})
+	contact = StringField('Contact', [validators.DataRequired(),validators.Length(min = 1,max = 10)],render_kw={"required": ""})
 
 
 
@@ -463,11 +463,11 @@ def add_employee():
 		ts = time.time()
 		timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
 		####
-		cur.execute("INSERT INTO employee(name, email, department, designation, address, contact, password, reg_date, admin, city, pincode, gender, dob) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, 0, %s, %s, %s, %s)", (name, email, department, designation, address, contact, password, timestamp, city, pincode, gender, dob))
+		cur.execute("INSERT INTO employee(name, email, department, designation, address, contact, password, reg_date, admin, pincode, gender, dob) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, 0, %s, %s, %s)", (name, email, department, designation, address, contact, password, timestamp, pincode, gender, dob))
 		tm_id = int(cur.lastrowid)
-		result = cur.execute("SELECT * FROM city_state WHERE city=%s",[city]);
+		result = cur.execute("SELECT * FROM city_state WHERE pincode=%s",[pincode]);
 		if result==0:
-			cur.execute("INSERT INTO city_state(city,state) VALUES (%s,%s)", (city,state))
+			cur.execute("INSERT INTO city_state(city,state,pincode) VALUES (%s,%s,%s)", (city,state,pincode))
 		result = cur.execute("SELECT * FROM state_nationality WHERE state=%s",[state]);
 		if result==0:
 			cur.execute("INSERT INTO state_nationality(state,nationality) VALUES (%s,%s)", (state, nationality))

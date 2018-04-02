@@ -4,51 +4,51 @@
 
 	
 	{% from "includes/_formhelpers.html" import render_field %}
-    <div class="jumbotron" style="margin-top:8%;">
+    <div style="margin-top:8%;">
     	<h1 align="center"> Add Employee </h1>
 	    <form method="POST" action="" enctype="multipart/form-data">
 	        <div class="form-group">
-	            {{ render_field(form.name, class="form-control") }}
+	            {{ render_field(form.name, class_="form-control") }}
 	        </div>
 	        <div class="form-group">
-	            {{ render_field(form.gender, class="form-control") }}
+	            {{ render_field(form.gender, class_="form-control") }}
 	        </div>
 	        <div>
         		<label for="from" style="font-size: 20px;">Date of Birth</label>
          		<input type="date" class="form-control" name="dob" max="3000-12-31" min="1000-01-01" placeholder='From' style="width:100%;">
 	        </div>
 	        <div class="form-group">
-	            {{ render_field(form.email, class="form-control") }}
+	            {{ render_field(form.email, class_="form-control") }}
 	        </div>
 	        <div class="form-group">
-	            {{ render_field(form.department, class="form-control") }}
+	            {{ render_field(form.department, class_="form-control") }}
 	        </div>
 	        <div class="form-group">
-	            {{ render_field(form.designation, class="form-control") }}
+	            {{ render_field(form.designation, class_="form-control") }}
 	        </div>
 	        <div class="form-group">
-	            {{ render_field(form.address, class="form-control") }}
+	            {{ render_field(form.address, class_="form-control") }}
 	        </div>
 	        <div class="form-group">
-	            {{ render_field(form.city, class="form-control") }}
+	            {{ render_field(form.city, class_="form-control") }}
 	        </div>
 	        <div class="form-group">
-	            {{ render_field(form.state, class="form-control") }}
+	            {{ render_field(form.state, class_="form-control") }}
 	        </div>
 	        <div class="form-group">
-	            {{ render_field(form.nationality, class="form-control") }}
+	            {{ render_field(form.nationality, class_="form-control") }}
 	        </div>
 	        <div class="form-group">
-	            {{ render_field(form.pincode, class="form-control") }}
+	            {{ render_field(form.pincode, class_="form-control") }}
 	        </div>
 	        <div class="form-group">
-	            {{ render_field(form.contact, class="form-control") }}
+	            {{ render_field(form.contact, class_="form-control") }}
 	        </div>
 	        <div class="form-group">
-	            {{ render_field(form.password, class="form-control") }}
+	            {{ render_field(form.password, class_="form-control") }}
 	        </div>
 	        <div class="form-group">
-	            {{ render_field(form.confirm, class="form-control") }}
+	            {{ render_field(form.confirm, class_="form-control") }}
 	        </div>
 
 	        <div>

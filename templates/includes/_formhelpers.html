@@ -1,7 +1,10 @@
 
 {% macro render_field(field) %}
-    {{ field.label }}
     {{ field(**kwargs)|safe }}
+
+    <span class="form-highlight"></span>
+    <span class="form-bar"></span>
+    {{ field.label(class_="float-label") }}
     {% if field.errors %}
         {% for error in field.errors %}
             <span class="help-inline">{{ error }}</span>
