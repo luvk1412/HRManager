@@ -32,6 +32,16 @@
 .col1 {
   margin-left : -43px;
 }
+
+.hcol1{
+  font-size:35px;
+  color:#888;
+  font-family:'Karla';
+  width:100%;
+}
+.col-md-4 {
+  margin :-10px;
+}
 .fileInput {
     cursor: pointer;
     height: 100%;

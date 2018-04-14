@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, redirect, request, url_for, session, logging
+from flask import Flask, render_template, flash, redirect, request, url_for, session, logging, jsonify
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators, SelectField,FileField
 from flask_wtf.file import FileField
 from passlib.hash import sha256_crypt
@@ -27,7 +27,6 @@ mysql = MySQL(app)
 photos = UploadSet('photos', IMAGES)
 app.config['UPLOADED_PHOTOS_DEST'] = 'static/images'
 configure_uploads(app, photos)
-login = False
 
 
 # Checking autharised acces for non admin lgoin
@@ -348,7 +347,6 @@ def login():
 @app.route('/logout')
 def logout():
 	session.clear()
-	login=False
 	flash('You are now logged out', 'success')
 	return redirect(url_for('login'))
 
@@ -408,11 +406,13 @@ def register():
 # Add employee
 			# Employee form
 class emp_form(Form):
-	name = StringField('Name', [validators.DataRequired(), validators.Length(min = 1,max = 50)],render_kw={"required": ""})
-	gender=SelectField('Gender', choices=[('male','male'), ('female','female'), ('other', 'other')],render_kw={"required": ""})
-	email = StringField('Email', [validators.DataRequired(),validators.Length(min = 1,max = 50)],render_kw={"required": ""})
-	department = SelectField('Department', choices=[('Overall','Overall'), ('Finance', 'Finance'), ('Research', 'Research'), ('Sales', 'Sales'), ('Marketing', 'Marketing')],render_kw={"required": ""})
-	designation = SelectField('Designation', choices=[('Ceo', 'Ceo'), ('HOD', 'HOD'), ('Manager', 'Manager'), ('Employee', 'Employee'),  ('Intern', 'Intern'),  ('Peon', 'Peon')],render_kw={"required": ""})
+	name = StringField('Department', [validators.DataRequired(), validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+	gender=SelectField('Gender', choices=[('',''),('male','male'), ('female','female'), ('other', 'other')],render_kw={"required": ""})
+	email = StringField('Email', [validators.DataRequired(),validators.Length(min = 1,max = 50), validators.Email()],render_kw={"required": ""})
+	# cur = mysql.connection.cursor()
+	# result = cur.execute("SELECT department FROM salary");
+	department = SelectField('Department', choices=[('','')],render_kw={"required": ""})
+	designation = SelectField('Designation', choices=[('','')],render_kw={"required": ""})
 	password = PasswordField('Password', [
 		validators.DataRequired(),
 		validators.Length(min = 5,max = 50),
@@ -436,6 +436,23 @@ class emp_form(Form):
 @is_admin_logged_in
 def add_employee():
 	form = emp_form(request.form)
+	cur_ = mysql.connection.cursor()
+	res = cur_.execute("SELECT * FROM salary")
+	depts = []
+	desigs = []
+	form.department.choices = [('','')]
+	form.designation.choices = [('','')]
+	for _ in range(res):
+		tmp = cur_.fetchone()
+		if tmp['department'] not in depts:
+			depts.append(tmp['department'])
+		if tmp['designation'] not in desigs:
+			desigs.append(tmp['designation'])
+	for i in depts:
+		form.department.choices += [(i,i)]
+	for i in desigs:
+		form.designation.choices += [(i,i)]
+	cur_.close()
 	if request.method == 'POST' and form.validate():
 		name = form.name.data
 		gender = form.gender.data
@@ -445,12 +462,6 @@ def add_employee():
 		email = form.email.data
 		department = form.department.data
 		designation = form.designation.data
-		if department == 'Overall' and (designation != 'Peon' and designation != 'Ceo'):
-			error='Overall can be Ceo or Peon'
-			return render_template('add_employee.html', form=form, error=error)
-		if department != 'Overall' and (designation == 'Peon' or designation == 'Ceo'):
-			error='Ceo or Peon can only be overall'
-			return render_template('add_employee.html', form=form, error=error)
 		address = form.address.data
 		city = form.city.data
 		state = form.state.data
@@ -459,6 +470,14 @@ def add_employee():
 		contact = form.contact.data
 		password = sha256_crypt.encrypt(str(form.password.data))
 		cur = mysql.connection.cursor()
+		result = cur.execute("SELECT designation FROM salary where department=%s",[department])
+		tmp = []
+		for _ in range(result):
+			data = cur.fetchone()
+			tmp.append(data['designation'])
+		if designation not in tmp:
+			error='The following combination of department and designation is not available'
+			return render_template('add_employee.html', form=form, error=error)
 		#finding cur date
 		ts = time.time()
 		timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
@@ -485,17 +504,143 @@ def add_employee():
 
 
 
+
+class add_dep(Form):
+	department = StringField('Department', [validators.DataRequired(), validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+	designation = StringField('Designation', [validators.DataRequired(), validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+	salary = StringField('Salary', [validators.DataRequired(), validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+class add_des(Form):
+	department = SelectField('Department', choices=[('','')],render_kw={"required": ""})
+	designation = StringField('Designation', [validators.DataRequired(), validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+	salary = StringField('Salary', [validators.DataRequired(), validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+
+class upd_sal(Form):
+	department = SelectField('Department', choices=[('','')],render_kw={"required": ""})
+	designation = SelectField('Designation', choices=[('','')],render_kw={"required": ""})
+	salary = StringField('Salary', [validators.DataRequired(), validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+
+
+@app.route('/hierarchy', methods=['GET', 'POST'])
+@is_logged_in
+def hierarchy():
+	form1 = add_dep(request.form)
+	form2 = add_des(request.form)
+	form3 = upd_sal(request.form)
+	cur_ = mysql.connection.cursor()
+	res = cur_.execute("SELECT * FROM salary")
+	depts = []
+	desigs = []
+	form2.department.choices = [('','')]
+	form3.department.choices = [('','')]
+	form3.designation.choices = [('','')]
+	for _ in range(res):
+		tmp = cur_.fetchone()
+		if tmp['department'] not in depts:
+			depts.append(tmp['department'])
+		if tmp['designation'] not in desigs:
+			desigs.append(tmp['designation'])
+	for i in depts:
+		form2.department.choices += [(i,i)]
+		form3.department.choices += [(i,i)]
+	for i in desigs:
+		form3.designation.choices += [(i,i)]
+	if request.method == 'POST':
+		if request.form['btn'] == 'form1' and form1.validate():
+			print("11")
+			department = form1.department.data
+			designation = form1.designation.data
+			salary = form1.salary.data
+			salary = int(salary)
+			cur = mysql.connection.cursor()
+			cur.execute("INSERT INTO salary(department,designation,amount_per_hour) VALUES(%s, %s, %s)", (department, designation, salary))
+			cur.connection.commit()
+			cur.close()
+			flash('Data added', 'success')
+		if request.form['btn'] == 'form2' and form2.validate():
+			print("22")
+			department = form2.department.data
+			designation = form2.designation.data
+			salary = form2.salary.data
+			salary = int(salary)
+			cur = mysql.connection.cursor()
+			cur.execute("INSERT INTO salary(department,designation,amount_per_hour) VALUES(%s, %s, %s)", (department, designation, salary))
+			cur.connection.commit()
+			cur.close()
+			flash('Designation and Salary added', 'success')
+		if request.form['btn'] == 'form3' and form3.validate():
+			print("33")
+			department = form3.department.data
+			designation = form3.designation.data
+			salary = form3.salary.data
+			salary = int(salary)
+			cur = mysql.connection.cursor()
+			result = cur.execute("SELECT designation FROM salary where department=%s",[department])
+			tmp = []
+			for _ in range(result):
+				data = cur.fetchone()
+				tmp.append(data['designation'])
+			if designation not in tmp:
+				error='The following combination of department and designation is not available'
+				return render_template('hierarchy.html', form1 = form1, form2 = form2, form3=form3, error=error)
+			cur.execute("UPDATE salary SET amount_per_hour=%s WHERE department=%s AND designation= %s", (salary, department, designation))
+			cur.connection.commit()
+			cur.close()
+			flash('Salary Updated', 'success')
+		return redirect(url_for('hierarchy'))
+	return render_template('hierarchy.html', form1 = form1, form2 = form2, form3=form3)
+
+
+@app.route('/make_admin/<string:id>', methods=['GET', 'POST'])
+@is_admin_logged_in
+def make_admin(id):
+	cur = mysql.connection.cursor()
+	id = int(id)
+	cur.execute("UPDATE employee SET admin=1 WHERE id=%s", [id])
+	mysql.connection.commit()
+	cur.close()
+	return jsonify("done"), 200
+
+@app.route('/remove_admin/<string:id>', methods=['GET', 'POST'])
+@is_admin_logged_in
+def remove_admin(id):
+	cur = mysql.connection.cursor()
+	id = int(id)
+	if id == 1:
+		return jsonify("cannot remove from admin"), 400
+
+	cur.execute("UPDATE employee SET admin=0 WHERE id=%s", [id])
+	mysql.connection.commit()
+	cur.close()
+	return jsonify("done"), 200
+
 @app.route('/')
 def index():
-	if login==True:
+	if session['logged_in']:
 		return redirect(url_for('dashboard'))
 	else:
 		return redirect(url_for('login'))
+# from flask import Response
 
+# @app.route("/")
+# def hello():
+#     return '''
+#         <html><body>
+#         Hello. <a href="/getPlotCSV" class="btn btn-primary">Click me.</a>
+#         </body></html>
+#         '''
 
+# @app.route("/getPlotCSV")
+# def getPlotCSV():
+#     # with open("outputs/Adjacency.csv") as fp:
+#     #     csv = fp.read()
+#     csv = '1,2,3\n4,5,6\n'
+#     return Response(
+#         csv,
+#         mimetype="text/csv",
+#         headers={"Content-disposition":
+#                  "attachment; filename=myplot.csv"})
 
-
-# Main
+# # Main
 
 
 if __name__ == '__main__':

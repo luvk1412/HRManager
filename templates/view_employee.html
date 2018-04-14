@@ -95,9 +95,9 @@
 				<th>{{employee.name}}</th>
 				<th><a href="/profile/{{employee.id}}" class="btn btn-info pull-left">View</a></th>
 				{% if employee.admin %}
-					<th>Already Admin</th>
+					<th><button class="btn btn-danger remove" id="{{employee.id}}">Remove admin</button></th>
 				{% else %}
-					<th><a href="#" class="btn btn-danger">Make admin</th>
+					<th><button class="admin btn btn-danger" id="{{employee.id}}">Make admin</button></th>
 				{% endif %}
 			</tr>
 		{% endfor %}
@@ -107,19 +107,51 @@
 
 
 	<script type="text/javascript">
-		$('.your-checkbox').prop('indeterminate', true)
-		var rangeSlider = function(){
-			var slider = $('.range-slider'),
-			range = $('.range-slider__range'),
-			value = $('.range-slider__value');
-			slider.each(function(){
-				value.each(function(){
-					var value = $(this).prev().attr('value');
-					$(this).html(value);
-				});
 
-			range.on('input', function(){
-				$(this).next(value).html(this.value);
+		$('.admin').on('click', function(){
+			var self = $(this)[0];
+			$.ajax({
+				url: "/make_admin/"+$(this)[0].id,
+				method: 'GET',
+				dataType: "json",
+				success(data) {
+					console.log($(this));
+					$("#"+self.id).addClass('remove');
+					$("#"+self.id).html("remove Admin");
+					location.reload();
+				}
+			});
+		});
+
+		$('.remove').on('click', function(){
+			var self = $(this)[0];
+			$.ajax({
+				url: "/remove_admin/"+$(this)[0].id,
+				method: 'GET',
+				dataType: "json",
+				success(data) {
+					console.log($(this));
+					$("#"+self.id).removeClass('remove');
+					$("#"+self.id).html("Make Admin");
+					location.reload();
+				}
+
+			});
+		});
+		
+			$('.your-checkbox').prop('indeterminate', true)
+			var rangeSlider = function(){
+				var slider = $('.range-slider'),
+				range = $('.range-slider__range'),
+				value = $('.range-slider__value');
+				slider.each(function(){
+					value.each(function(){
+						var value = $(this).prev().attr('value');
+						$(this).html(value);
+					});
+
+				range.on('input', function(){
+					$(this).next(value).html(this.value);
 				});
 			});
 		};

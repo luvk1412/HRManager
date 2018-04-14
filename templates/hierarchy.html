@@ -1,0 +1,64 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+{% from "includes/_formhelpers.html" import render_field %}
+<div class="container-fluid" style="margin-top: 10%;">
+<h1 align="center" style="color:#888; font-family:'Karla'; font-size:72px;">Edit Hierarchy</h1>
+<div class="row" style="margin-top: 5%;">
+    <div class="col-sm-4 col-md-4 col-lg-4">
+    <div class="hcol1 jumbotron" >
+		Add Department
+		<form method="POST" action="" enctype="multipart/form-data">
+			<div class="form-group">
+				{{ render_field(form1.department, class_="form-control") }}
+			</div>
+			<div class="form-group">
+				{{ render_field(form1.designation, class_="form-control") }}
+			</div>
+			<div class="form-group">
+				{{ render_field(form1.salary, class_="form-control") }}
+			</div>
+			<p align="center">
+			<button type="submit" class='btn btn-primary' name ='btn' value="form1">Add</button></p>
+		</form>
+		</div>
+    </div>
+    <div class="col-sm-4 col-md-4 col-lg-4">
+    <div class="hcol1 jumbotron" >
+		Add Designation
+		<form method="POST" action="" enctype="multipart/form-data">
+			<div class="form-group">
+				{{ render_field(form2.department, class_="form-control") }}
+			</div>
+			<div class="form-group">
+				{{ render_field(form2.designation, class_="form-control") }}
+			</div>
+			<div class="form-group">
+				{{ render_field(form2.salary, class_="form-control") }}
+			</div>
+			<p align="center">
+			<button type="submit" class='btn btn-primary' name='btn' value="form2">Add</button></p>
+		</form>
+</div>
+    </div>
+    <div class="col-sm-4 col-md-4 col-lg-4">
+    <div class="hcol1 jumbotron" >
+		Update Salary
+		<form method="POST" action="" enctype="multipart/form-data">
+			<div class="form-group">
+				{{ render_field(form3.department, class_="form-control") }}
+			</div>
+			<div class="form-group">
+				{{ render_field(form3.designation, class_="form-control") }}
+			</div>
+			<div class="form-group">
+				{{ render_field(form3.salary, class_="form-control") }}
+			</div>
+			<p align="center">
+			<button type="submit" class='btn btn-primary' name ='btn' value="form3">Update</button></p>
+		</form>
+</div>
+    </div>
+</div>
+</div>
+{% endblock %}

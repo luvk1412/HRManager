@@ -14,12 +14,18 @@
 		<script src="/static/js/jquerry.js"></script>
 		<script src="/static/js/bootstrap.min.js"></script>
 		<script type="text/javascript" src="/static/js/popper.min.js"></script>
-		<script type="text/javascript" src="/static/js/mdb.min.js"></script>
+		<!-- <script type="text/javascript" src="/static/js/mdb.min.js"></script> -->
 	<body>
 		{% include 'includes/_navbar.html' %}
 		<div class = "container">
 			{% include 'includes/_messages.html' %}
 			{% block body %}{% endblock %}
 		</div>
+		{% if session.logged_in %}
+		<div id="umiwebchat-container"></div><script>var LandbotLiveConfig = { index: 'https://landbot.io/u/H-36750-ABC8P1NWZ7P4QLTP/index.html', accent: '#c05c59' };</script><script src="https://static.helloumi.com/umiwebchat/umiwebchat.js" defer></script>
+		{% endif %}
 	</body>
 </html>
+
+
+
