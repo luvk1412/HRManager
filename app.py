@@ -14,7 +14,7 @@ app = Flask(__name__, static_url_path='/static')
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '123456'
+app.config['MYSQL_PASSWORD'] = 'iiita123'
 app.config['MYSQL_DB'] = 'hrmanager'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
@@ -305,6 +305,86 @@ def profile(id):
 		return render_template('profile.html', employee=employee)
 	error='Employee Not found'
 	return render_template('profile.html', error=error)
+
+
+#edit profile profile
+
+class edit_form(Form):
+	name = StringField('Name', [validators.DataRequired(), validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+	gender=SelectField('Gender', choices=[('male','male'), ('female','female'), ('other', 'other')],render_kw={"required": ""})
+	email = StringField('Email', [validators.DataRequired(),validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+	# department = SelectField('Department', choices=[('Overall','Overall'), ('Finance', 'Finance'), ('Research', 'Research'), ('Sales', 'Sales'), ('Marketing', 'Marketing')],render_kw={"required": ""})
+	# designation = SelectField('Designation', choices=[('Ceo', 'Ceo'), ('HOD', 'HOD'), ('Manager', 'Manager'), ('Employee', 'Employee'),  ('Intern', 'Intern'),  ('Peon', 'Peon')],render_kw={"required": ""})
+	# password = PasswordField('Password', [
+	# 	validators.DataRequired(),
+	# 	validators.Length(min = 5,max = 50),
+	# 	validators.EqualTo('confirm', message="Password do not match")
+	# ],render_kw={"required": ""})
+	# confirm = PasswordField('Confirm Password',render_kw={"required": ""})
+
+	address = StringField('Address', [validators.DataRequired(),validators.Length(min = 1,max = 500)],render_kw={"required": ""})
+	city = StringField('City', [validators.DataRequired(),validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+	state = StringField('State', [validators.DataRequired(),validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+	nationality = StringField('Nationality', [validators.DataRequired(),validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+
+	pincode = StringField('Pin Code', [validators.DataRequired(),validators.Length(min = 1,max = 10)],render_kw={"required": ""})
+	contact = StringField('Contact', [validators.DataRequired(),validators.Length(min = 1,max = 10)],render_kw={"required": ""})
+
+
+@app.route('/edit_profile/<string:id>', methods=['GET', 'POST'])
+@is_logged_in
+def edit_profile(id):
+	#emp_id = session['emp_id']
+	emp_id = id;
+	form = edit_form(request.form)
+	if request.method == 'POST' and form.validate():
+		name = form.name.data
+		gender = form.gender.data
+		dob = request.form['dob']
+		email = form.email.data
+		address = form.address.data
+		city = form.city.data
+		state = form.state.data
+		nationality = form.nationality.data
+		pincode = form.pincode.data
+		contact = form.contact.data
+
+		cur = mysql.connection.cursor()
+		#finding cur date
+		# ts = time.time()
+		# timestamp = datetime.datetime.fromtimestamp(ts).strftime('%Y-%m-%d')
+		####
+		# cur.execute("INSERT INTO employee(name, email, department, designation, address, contact, password, reg_date, admin, pincode, gender, dob) VALUES(%s, %s, %s, %s, %s, %s, %s, %s, 0, %s, %s, %s)", (name, email, department, designation, address, contact, password, timestamp, pincode, gender, dob))
+		cur.execute("UPDATE employee SET name=%s, email=%s, contact=%s, address=%s, dob=%s, pincode=%s ,gender=%s WHERE id=%s", (name, email, contact, address, dob, pincode, gender, id))
+		tm_id = int(cur.lastrowid)
+		result = cur.execute("SELECT * FROM city_state WHERE pincode=%s",[pincode]);
+		if result==0:
+			cur.execute("INSERT INTO city_state(city,state,pincode) VALUES (%s,%s,%s)", (city,state,pincode))
+		result = cur.execute("SELECT * FROM state_nationality WHERE state=%s",[state]);
+		if result==0:
+			cur.execute("INSERT INTO state_nationality(state,nationality) VALUES (%s,%s)", (state, nationality))
+		mysql.connection.commit()
+		cur.close()
+		img_new_name = str(tm_id)
+		flag = 0
+
+
+		if 'profile_image' in request.files:
+			file = request.files['profile_image']
+			file.filename = str(tm_id) + '.jpg'
+			photos.save(file)
+		flash('Employee details updated', 'success')
+		return redirect('/profile/'+emp_id)
+
+	emp_id = id
+	cur = mysql.connection.cursor()
+	result = cur.execute("SELECT * FROM e_v WHERE id = %s", [emp_id])
+	if result > 0:
+		employee = cur.fetchone()
+		employee['id'] = str(employee['id'])
+		cur.close()
+		return render_template('edit_profile.html', form=form , employee=employee)
+	return render_template('edit_profile.html', form=form , employee=employee)
 
 
 #login page

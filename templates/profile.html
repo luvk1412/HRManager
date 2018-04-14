@@ -8,20 +8,18 @@
       <h3>{{employee.name}}</h3>
       <h4>{{employee.designation}}, {{employee.department}}</h4>
       {% if session.emp_id==employee.id %}
-        <button class="btn btn-info">Edit Profile</button>
+        <button type="button" class="btn btn-info" name="btn" value="edit_profile" onclick="window.open('/edit_profile/{{employee.id}}', '_top');">Edit Profile</button>
         <button type="button" class="btn btn-info" name="btn" value="change_password" onclick="window.open('/change_password', '_top');">Change Password</button>
       {% endif %}
-      
+
 </div>
 
-<div class= "jumbotron">
+<div class= "jumbotron" style="">
 	<h3 align=left><b>Personal Information</b></h3>
 <br>
   <h5 align=left id="gendervar" data-gendervar = "{{employee.gender}}" ></h5>
   <h5 align=left><b>Birthday : {{employee.dob}}</b></h5>
   <h5 align=left><b>Nationality : {{employee.gender}}</b></h5>
-  <h5 align=left><b>Blood Group : {{employee.gender}}</b></h5>
-  <h5 align=left><b>Marital Status : {{employee.gender}}</b></h5>
 </div>
 
 <div class= "jumbotron">
@@ -30,6 +28,9 @@
   <h5 align=left><b>Mobile Number : {{employee.contact}}</b></h5>
   <h5 align=left><b>E-mail : {{employee.email}}</b></h5>
   <h5 align=left><b>Location : {{employee.address}}</b></h5>
+  <h5 align=left><b>City : {{employee.city}}</b></h5>
+  <h5 align=left><b>State : {{employee.state}}</b></h5>
+  <h5 align=left><b>Pincode : {{employee.pincode}}</b></h5>
 </div>
 
 
