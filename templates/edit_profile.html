@@ -1,0 +1,51 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+
+	{% from "includes/_formhelpers.html" import render_field %}
+    <div style="margin-top:8%;">
+    	<h1 align="center"> Edit Profile </h1>
+	    <form method="POST" action="" enctype="multipart/form-data">
+	        <div class="form-group">
+	            {{ render_field(form.name, class_="form-control" , value=employee.name) }}
+	        </div>
+	        <div class="form-group">
+	            {{ render_field(form.gender, class_="form-control",  value=employee.gender) }}
+	        </div>
+	        <div>
+        		<label for="from" style="font-size: 20px;">Date of Birth</label>
+         		<input type="date" class="form-control" name="dob" max="3000-12-31" min="1000-01-01" placeholder='From' style="width:100%;" value = '{{employee.dob}}'>
+	        </div>
+	        <div class="form-group">
+	            {{ render_field(form.email, class_="form-control",  value=employee.email) }}
+	        </div>
+	        <div class="form-group">
+	            {{ render_field(form.address, class_="form-control" , value=employee.address) }}
+	        </div>
+	        <div class="form-group">
+	            {{ render_field(form.city, class_="form-control" , value=employee.city) }}
+	        </div>
+	        <div class="form-group">
+	            {{ render_field(form.state, class_="form-control" , value=employee.state) }}
+	        </div>
+	        <div class="form-group">
+	            {{ render_field(form.nationality, class_="form-control" , value=employee.nationality) }}
+	        </div>
+	        <div class="form-group">
+	            {{ render_field(form.pincode, class_="form-control" , value=employee.pincode)}}
+	        </div>
+	        <div class="form-group">
+	            {{ render_field(form.contact, class_="form-control" , value=employee.contact) }}
+	        </div>
+
+	        <div>
+	        	<label for="profile_image">Profile Image</label></br>
+	            <input type="file" name="profile_image">
+	        </div>
+	        <p align =center></br><input type="submit" class="btn btn-primary" value="Submit"></p>
+	    </form>
+	</div>
+
+
+{% endblock %}
