@@ -1,4 +1,4 @@
-from flask import Flask, render_template, flash, redirect, request, url_for, session, logging, jsonify
+from flask import Flask, render_template, flash, redirect, request, url_for, session, logging, jsonify, make_response
 from wtforms import Form, StringField, TextAreaField, PasswordField, validators, SelectField,FileField
 from flask_wtf.file import FileField
 from passlib.hash import sha256_crypt
@@ -7,6 +7,7 @@ from flask_mysqldb import MySQL
 import datetime, time
 from werkzeug import secure_filename
 from flask_uploads import UploadSet, configure_uploads, IMAGES
+import pdfkit
 app = Flask(__name__, static_url_path='/static')
 
 
@@ -254,7 +255,7 @@ def salary():
 			error='To Date cannot be smaller than From date'
 			return render_template('salary.html', error=error)
 		cur = mysql.connection.cursor()
-		result = cur.execute("SELECT * FROM employee WHERE id = %s", [emp_id])
+		result = cur.execute("SELECT * FROM e_v WHERE id = %s", [emp_id])
 		if result > 0:
 			emp_data = cur.fetchone()
 			tmp = cur.execute("SELECT * FROM salary WHERE department = %s && designation = %s", (emp_data['department'], emp_data['designation']))
@@ -266,15 +267,20 @@ def salary():
 			for _ in range(tmp2):
 				tmp_data = cur.fetchone()
 				incent_tot += tmp_data['hours']
-		#	app.logger.info(att_ct)
-		#	app.logger.info(incent_tot)
-		#	app.logger.info(salary_data['amount_per_hour'])
 			salary_tot = 0
 			salary_tot += salary_data['amount_per_hour'] * (att_ct + incent_tot)
-			msg='Salary for the employee with id ' + str(emp_data['id']) + ' from ' + from_date + ' to ' + to_date + ' is ' + str(salary_tot)
-			cur.close()
-			flash(msg, 'info')
-			return render_template('salary.html')
+			if request.form['btn'] == 'cal':
+				msg='Salary for the employee with id ' + str(emp_data['id']) + ' from ' + from_date + ' to ' + to_date + ' is ' + str(salary_tot)
+				cur.close()
+				flash(msg, 'info')
+				return render_template('salary.html')
+			elif request.form['btn'] == 'gen':
+				rendered = render_template('payroll.html', employee=emp_data, fro=from_date,to=to_date,salary=salary_tot)
+				pdf = pdfkit.from_string(rendered, False)
+				response = make_response(pdf)
+				response.headers['Content-Type'] = 'application/pdf'
+				response.headers['Content-Disposition'] = 'inline; filename=payroll.pdf'
+				return response
 		else:
 			error='Employee id not found'
 			cur.close()
@@ -432,16 +438,16 @@ def logout():
 
 
 class check_password(Form):
-	old_password = PasswordField('', [
+	old_password = PasswordField('Old Password', [
 			validators.DataRequired(),
 			validators.Length(min = 5,max = 50)
-		],render_kw={"placeholder": "Old Password"})
-	new_password = PasswordField('', [
+		],render_kw={"required": ""})
+	new_password = PasswordField('New Password', [
 		validators.DataRequired(),
 		validators.Length(min = 5,max = 50),
 		validators.EqualTo('confirm_newpassword', message="Password do not match")
-	],render_kw={"placeholder": "New Password"})
-	confirm_newpassword = PasswordField('',render_kw={"placeholder": "Confirm New Password"})
+	],render_kw={"required": ""})
+	confirm_newpassword = PasswordField('Confirm Password',render_kw={"required": ""})
 
 @app.route('/change_password', methods=['GET','POST'])
 @is_logged_in

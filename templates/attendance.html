@@ -1,15 +1,20 @@
 {% extends 'layout.html' %}
 
 {% block body %}
-<div class="gwrap" style="margin-top: 2%;">
-	Mark Attendance
+<div style="margin-top:8%;">
+<div class='hcol1 jumbotron' style="width:500px;text-align:center;margin:auto;">
+  	<p align =center style="font-size:62px;">Attendance</p>
 	<form method="POST" action="">
-		<div>
-			<input type='text' class="glogininput" name='emp_id' placeholder='Employee Id'>
+		<div class='form-group'>
+			<input class="form-control" id="emp_id" name="emp_id" required="" type="text" value="">
+		    <span class="form-highlight"></span>
+		    <span class="form-bar"></span>
+		    <label class="float-label" for="emp_id">Employee Id</label>
 		</div>
-		<div>	
-			<button type="submit" class='attendancebtn'>Mark Attendance</button>
+		<div class='form-group'>	
+			<button type="submit" class='btn btn-info'>Mark Attendance</button>
 		</div>
 	</form>
+</div>
 </div>
 {% endblock %}
