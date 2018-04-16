@@ -13,11 +13,9 @@
 						</label>
 						<select id="department" class="custom-select" name="department" style="width:400px;">
 							<option selected>Select Department</option>
-							<option value="Overall">Overall</option>
-							<option value="Finance">Finance</option>
-							<option value="Research">Research</option>
-							<option value="Sales">Sales</option>
-							<option value="Marketing">Marketing</option>
+							{% for dept in depts %}
+								<option value="{{dept}}">{{dept}}</option>
+							{% endfor %}
 						</select>
 					</div>
 					<div class="col-md-6">
@@ -26,12 +24,9 @@
 						</label>
 						<select id="designation" class="custom-select" name="designation" style="width:400px;">
 							<option selected>Select Designation</option>
-							<option value="Ceo">Ceo</option>
-							<option value="HOD">HOD</option>
-							<option value="Manager">Manager</option>
-							<option value="Employee">Employee</option>
-							<option value="Intern">Intern</option>
-							<option value="Peon">Peon</option>
+							{% for desig in desigs %}
+								<option value="{{desig}}">{{desig}}</option>
+							{% endfor %}
 						</select>
 					</div>
 				</div>
@@ -47,15 +42,15 @@
 						</div>
 					</div>
 					<div class="col-md-6">
-					<label class="label--checkbox">
-						<input type="checkbox" class="checkbox" name="cgender">
-					</label>
-					<select id="designation" class="custom-select" name="gender" style="width:400px;">
-					<option selected>Gender</option>
-					<option value="male">male</option>
-					<option value="female">female</option>
-					<option value="other">other</option>		  
-					</select>
+						<label class="label--checkbox">
+							<input type="checkbox" class="checkbox" name="cgender">
+						</label>
+						<select id="designation" class="custom-select" name="gender" style="width:400px;">
+						<option selected>Gender</option>
+						<option value="male">male</option>
+						<option value="female">female</option>
+						<option value="other">other</option>		  
+						</select>
 					</div>
 				</div>
 			
@@ -88,17 +83,20 @@
 			<th>Name</th>
 			<th></th>
 			<th></th>
+			<th></th>
+			<th></th>
 		</tr>
  		{% for employee in employees %}
 			<tr>
 				<th>{{employee.id}}</th>
 				<th>{{employee.name}}</th>
-				<th><a href="/profile/{{employee.id}}" class="btn btn-info pull-left">View</a></th>
+				<th><a href="/profile/{{employee.id}}" class="btn btn-info">View</a></th>
 				{% if employee.admin %}
-					<th><button class="btn btn-danger remove" id="{{employee.id}}">Remove admin</button></th>
+					<th><button class="btn btn-danger remove pull-right" id="{{employee.id}}">Remove admin</button></th>
 				{% else %}
-					<th><button class="admin btn btn-danger" id="{{employee.id}}">Make admin</button></th>
+					<th><button class="admin btn btn-danger pull-right" id="{{employee.id}}">Make admin</button></th>
 				{% endif %}
+				<th><th><button class="del btn btn-danger pull-right" id="{{employee.id}}">Delete</button></th>
 			</tr>
 		{% endfor %}
  
@@ -107,7 +105,17 @@
 
 
 	<script type="text/javascript">
-
+		$('.del').on('click', function(){
+			var self = $(this)[0];
+			$.ajax({
+				url: "/delete/"+$(this)[0].id,
+				method: 'GET',
+				dataType: "json",
+				success(data) {
+					location.reload();
+				}
+			});
+		});
 		$('.admin').on('click', function(){
 			var self = $(this)[0];
 			$.ajax({
@@ -115,7 +123,6 @@
 				method: 'GET',
 				dataType: "json",
 				success(data) {
-					console.log($(this));
 					$("#"+self.id).addClass('remove');
 					$("#"+self.id).html("remove Admin");
 					location.reload();

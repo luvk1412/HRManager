@@ -104,6 +104,16 @@ def dashboard():
 @app.route('/employee/view', methods=['GET', 'POST'])
 @is_admin_logged_in
 def view_employee():
+	cur_ = mysql.connection.cursor()
+	res = cur_.execute("SELECT * FROM salary")
+	depts = []
+	desigs = []
+	for _ in range(res):
+		tmp = cur_.fetchone()
+		if tmp['department'] not in depts:
+			depts.append(tmp['department'])
+		if tmp['designation'] not in desigs:
+			desigs.append(tmp['designation'])
 	if request.method == 'POST':
 		inst = ""
 		flag = 0
@@ -157,12 +167,12 @@ def view_employee():
 		if result > 0:
 			employees = cur.fetchall()
 			cur.close()
-			return render_template('view_employee.html', employees=employees)
+			return render_template('view_employee.html', employees=employees,depts = depts, desigs = desigs)
 		else:
 			msg='No Employee Found'
 			cur.close()
-			return render_template('view_employee.html', error=msg)
-	return render_template('view_employee.html')
+			return render_template('view_employee.html', error=msg,depts = depts, desigs = desigs)
+	return render_template('view_employee.html', depts = depts, desigs = desigs)
 
 
 # Attendance
@@ -288,6 +298,8 @@ def salary():
 	return render_template('salary.html')
 
 
+
+
 #About page
 
 @app.route('/about')
@@ -319,14 +331,6 @@ class edit_form(Form):
 	name = StringField('Name', [validators.DataRequired(), validators.Length(min = 1,max = 50)],render_kw={"required": ""})
 	gender=SelectField('Gender', choices=[('male','male'), ('female','female'), ('other', 'other')],render_kw={"required": ""})
 	email = StringField('Email', [validators.DataRequired(),validators.Length(min = 1,max = 50)],render_kw={"required": ""})
-	# department = SelectField('Department', choices=[('Overall','Overall'), ('Finance', 'Finance'), ('Research', 'Research'), ('Sales', 'Sales'), ('Marketing', 'Marketing')],render_kw={"required": ""})
-	# designation = SelectField('Designation', choices=[('Ceo', 'Ceo'), ('HOD', 'HOD'), ('Manager', 'Manager'), ('Employee', 'Employee'),  ('Intern', 'Intern'),  ('Peon', 'Peon')],render_kw={"required": ""})
-	# password = PasswordField('Password', [
-	# 	validators.DataRequired(),
-	# 	validators.Length(min = 5,max = 50),
-	# 	validators.EqualTo('confirm', message="Password do not match")
-	# ],render_kw={"required": ""})
-	# confirm = PasswordField('Confirm Password',render_kw={"required": ""})
 
 	address = StringField('Address', [validators.DataRequired(),validators.Length(min = 1,max = 500)],render_kw={"required": ""})
 	city = StringField('City', [validators.DataRequired(),validators.Length(min = 1,max = 50)],render_kw={"required": ""})
@@ -698,6 +702,22 @@ def remove_admin(id):
 	mysql.connection.commit()
 	cur.close()
 	return jsonify("done"), 200
+
+
+#Delete employee
+@app.route('/delete/<string:id>', methods=['GET', 'POST'])
+@is_admin_logged_in
+def del_emp(id):
+	emp_id = id
+	id=int(id)
+	if id == 1:
+		return jsonify("cannot remove"), 400
+	cur = mysql.connection.cursor()
+	cur.execute("DELETE FROM employee WHERE id = %s", [emp_id])
+	mysql.connection.commit()
+	cur.close()
+	return jsonify("done"), 200
+
 
 @app.route('/')
 def index():
