@@ -15,7 +15,7 @@ app = Flask(__name__, static_url_path='/static')
 
 app.config['MYSQL_HOST'] = 'localhost'
 app.config['MYSQL_USER'] = 'root'
-app.config['MYSQL_PASSWORD'] = '123456'
+app.config['MYSQL_PASSWORD'] = 'iiita123'
 app.config['MYSQL_DB'] = 'hrmanager'
 app.config['MYSQL_CURSORCLASS'] = 'DictCursor'
 
@@ -492,7 +492,7 @@ def register():
 # Add employee
 			# Employee form
 class emp_form(Form):
-	name = StringField('Department', [validators.DataRequired(), validators.Length(min = 1,max = 50)],render_kw={"required": ""})
+	name = StringField('Name', [validators.DataRequired(), validators.Length(min = 1,max = 50)],render_kw={"required": ""})
 	gender=SelectField('Gender', choices=[('',''),('male','male'), ('female','female'), ('other', 'other')],render_kw={"required": ""})
 	email = StringField('Email', [validators.DataRequired(),validators.Length(min = 1,max = 50), validators.Email()],render_kw={"required": ""})
 	# cur = mysql.connection.cursor()
@@ -589,6 +589,55 @@ def add_employee():
 	return render_template('add_employee.html', form=form)
 
 
+
+
+class change_dep(Form):
+	emp_id = StringField('emp_id', [validators.DataRequired()], render_kw={"required": ""} )
+	department = SelectField('Department', choices=[('','')],render_kw={"required": ""})
+	designation = SelectField('Designation', choices=[('','')],render_kw={"required": ""})
+
+
+@app.route('/employee/change_department', methods=['GET', 'POST'])
+@is_admin_logged_in
+def change_department():
+	form = change_dep(request.form)
+	cur_ = mysql.connection.cursor()
+	res = cur_.execute("SELECT * FROM salary")
+	depts = []
+	desigs = []
+	form.department.choices = [('','')]
+	form.designation.choices = [('','')]
+	for _ in range(res):
+		tmp = cur_.fetchone()
+		if tmp['department'] not in depts:
+			depts.append(tmp['department'])
+		if tmp['designation'] not in desigs:
+			desigs.append(tmp['designation'])
+	for i in depts:
+		form.department.choices += [(i,i)]
+	for i in desigs:
+		form.designation.choices += [(i,i)]
+	cur_.close()
+
+	if request.method == 'POST'and form.validate():
+		emp_id = form.emp_id.data
+		department = form.department.data
+		designation = form.designation.data
+
+		cur = mysql.connection.cursor()
+		result = cur.execute("SELECT * FROM employee WHERE id = %s", [emp_id])
+		if result > 0:
+			cur.execute("UPDATE employee SET designation = %s, department = %s WHERE id=%s",(designation, department, emp_id))
+
+			mysql.connection.commit()
+			cur.close()
+			return render_template('change_department.html', form = form)
+		else:
+			error='Employee id not found'
+			cur.close()
+			return render_template('change_department.html', form = form, error=error)
+
+	return render_template('change_department.html', form = form)
 
 
 class add_dep(Form):

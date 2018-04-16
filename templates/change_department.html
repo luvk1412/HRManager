@@ -1,0 +1,26 @@
+{% extends 'layout.html' %}
+
+{% block body %}
+
+{% from "includes/_formhelpers.html" import render_field %}
+<div style="margin-top:8%;">
+<div class='hcol1 jumbotron' style="width:500px;text-align:center;margin:auto;">
+  	<p align =center style="font-size:42px;">Change Department</p>
+    <form method="POST" action="">
+      <div class=form-group>
+          {{ render_field(form.emp_id, class="form-control") }}
+      </div>
+
+      <div class=form-group>
+          {{ render_field(form.department, class="form-control") }}
+      </div>
+
+      <div class=form-group>
+          {{ render_field(form.designation, class="form-control") }}
+      </div>
+      <p align=center>
+    	<button type="submit" class="btn btn-primary">Reset</button></p>
+    </form>
+</div>
+</div>
+{% endblock %}
